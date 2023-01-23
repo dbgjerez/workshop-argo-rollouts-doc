@@ -271,7 +271,7 @@ You can check the deployment with the following requests:
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-curl "$(oc get routes film-storage-online -n {user}-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp
+curl -s "$(oc get routes film-storage-online -n {user}-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp
 ----
 
 [.console-input]
@@ -289,7 +289,7 @@ curl "$(oc get routes film-storage-online -n {user}-blue-green --template='http:
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-curl "$(oc get routes film-storage-offline -n {user}-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp
+curl -s "$(oc get routes film-storage-offline -n {user}-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp
 ----
 
 [.console-input]
@@ -315,7 +315,7 @@ Argo Rollouts provides this command to promote film-storage:
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts promote dstrategies-back -n {user}-blue-green
+oc argo rollouts promote film-storage-blue-green -n {user}-blue-green
 ----
 
 First **Argo Rollouts** will just change the service to use the new release (ReplicaSet). We *minimize downtime* because it just changes the service label. 
@@ -323,100 +323,46 @@ First **Argo Rollouts** will just change the service to use the new release (Rep
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-blue-green
-NAME                                  KIND         STATUS        AGE  INFO
-⟳ dstrategies-back                            Rollout      ✔ Healthy     88m  
-├──# revision:2                                                       
-│  ├──⧉ dstrategies-back-9dc6f576f            ReplicaSet   ✔ Healthy     62m  stable,active
-│  │  └──□ dstrategies-back-9dc6f576f-lmgd7   Pod          ✔ Running     62m  ready:1/1
-│  └──α dstrategies-back-9dc6f576f-2-pre      AnalysisRun  ✔ Successful  62m  ✔ 1
-└──# revision:1                                                       
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet   ✔ Healthy     88m  delay:27s
-      └──□ dstrategies-back-67fc9fb79b-p7jk9  Pod          ✔ Running     88m  ready:1/1
+oc argo rollouts get rollout film-storage-blue-green --watch -n {user}-blue-green
+NAME                                                 KIND         STATUS        AGE  INFO
+⟳ film-storage-blue-green                            Rollout      ✔ Healthy     43m  
+├──# revision:6                                                                      
+│  ├──⧉ film-storage-blue-green-7c455c98c8           ReplicaSet   ✔ Healthy     28m  stable,active
+│  │  └──□ film-storage-blue-green-7c455c98c8-m7bwh  Pod          ✔ Running     24m  ready:1/1
+│  └──α film-storage-blue-green-7c455c98c8-6-pre     AnalysisRun  ✔ Successful  23m  ✔ 1
+└──# revision:5                                                                      
+   └──⧉ film-storage-blue-green-644f5f6df7           ReplicaSet   ✔ Healthy     43m  delay:20s
+      └──□ film-storage-blue-green-644f5f6df7-bhq6z  Pod          ✔ Running     43m  ready:1/1
 ----
 This is our current status:
 
-image::rollout-blue-green-step-2-initial.png["Dstrategies Step 2 initial"]
+image::rollout-blue-green-step-2-initial.png["film-storage step2 initial"]
 
-And after *scaleDownDelaySeconds* **Argo Rollouts** will scale down the first replicaSet (V1.0.0).
+And after *scaleDownDelaySeconds* **Argo Rollouts** will scale down the first replicaSet (0.2).
  
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-blue-green
- NAME                                 KIND         STATUS        AGE  INFO
-⟳ dstrategies-back                           Rollout      ✔ Healthy     89m  
-├──# revision:2                                                      
-│  ├──⧉ dstrategies-back-9dc6f576f           ReplicaSet   ✔ Healthy     62m  stable,active
-│  │  └──□ dstrategies-back-9dc6f576f-lmgd7  Pod          ✔ Running     62m  ready:1/1
-│  └──α dstrategies-back-9dc6f576f-2-pre     AnalysisRun  ✔ Successful  62m  ✔ 1
-└──# revision:1                                                      
-   └──⧉ dstrategies-back-67fc9fb79b          ReplicaSet   • ScaledDown  89m  
+oc argo rollouts get rollout film-storage-blue-green -n {user}-blue-green
+NAME                                                 KIND         STATUS        AGE  INFO
+⟳ film-storage-blue-green                            Rollout      ✔ Healthy     45m  
+├──# revision:6                                                                      
+│  ├──⧉ film-storage-blue-green-7c455c98c8           ReplicaSet   ✔ Healthy     30m  stable,active
+│  │  └──□ film-storage-blue-green-7c455c98c8-m7bwh  Pod          ✔ Running     26m  ready:1/1
+│  └──α film-storage-blue-green-7c455c98c8-6-pre     AnalysisRun  ✔ Successful  26m  ✔ 1
+└──# revision:5                                                                      
+   └──⧉ film-storage-blue-green-644f5f6df7           ReplicaSet   • ScaledDown  45m 
 ----
 
 This is our final status:
 
-image::rollout-blue-green-step-2.png["Dstrategies Step 2"]
+image::rollout-blue-green-step-2.png["film-storage blue/green step 2"]
 
-To test the new online service, you can use the frontend http://dstrategies-frontend-{user}-blue-green.apps.%CLUSTER%/[URL]
-
-Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:
-
-.Frontend Interface
-image::frontend-blue-green-v2.png["Frontend Interface V2.0.0"]
-
-**We have in the online environment the new version V2.0.0!!!**
-
-[#03-rollback]
-=== Rollback
-
-Imagine that something goes wrong, we know that this never happens but just in case. We can do a very *quick rollback* just by undoing the change in the *dstrategies-back* online service.
-
-**Argo Rollouts** has an https://argoproj.github.io/argo-rollouts/generated/kubectl-argo-rollouts/kubectl-argo-rollouts_undo/[undo] command to do the rollback. In our opinion, we don't like this procedure because it is not aligned with GitOps. **Argo Rollouts** changes do not come from git, so git is `OutOfSync` with what we have in Openshift.
-In our case the commit that we have done not only changes the ReplicaSet but also the ConfigMap. The *undo* command only changes the ReplicaSet, so it does not work for us.
-
-We recommend making changes in git rather than in Argo Rollouts. Therefore, we will revert the last commit:
+To test the new online service, you can use again both URL (online and offline):
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-git revert HEAD --no-edit
-git push
+curl -s "$(oc get routes film-storage-offline -n {user}-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp
+curl -s "$(oc get routes film-storage-online -n {user}-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp
 ----
-**ArgoCD** will get the changes and apply them. **Argo Rollouts** will create a new revision with the previous version.
-
-image::rollout-blue-green-step-rollback-initial.png["Dstrategies Step Rollback initial"]
-
-[.console-output]
-[source,input,subs="+macros,+attributes"]
-----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-blue-green
-NAME                                          KIND         STATUS        AGE   INFO
-⟳ dstrategies-back                            Rollout      ॥ Paused      34m   
-├──# revision:3                                                                
-│  ├──⧉ dstrategies-back-9d7b5bb4c            ReplicaSet   ✔ Healthy     34m   preview
-│  │  └──□ dstrategies-back-9d7b5bb4c-8twhx   Pod          ✔ Running     101s  ready:1/1
-│  └──α dstrategies-back-9d7b5bb4c-3-pre      AnalysisRun  ✔ Successful  70s   ✔ 1
-└──# revision:2                                                                
-   ├──⧉ dstrategies-back-7fcdfb7748           ReplicaSet   ✔ Healthy     11m   stable,active
-   │  └──□ dstrategies-back-7fcdfb7748-lcldp  Pod          ✔ Running     11m   ready:1/1
-   └──α dstrategies-back-7fcdfb7748-2-pre     AnalysisRun  ✔ Successful  11m   ✔ 1 
-----
-
-Execute this command to promote dstrategies-back to version *V1.0.0*:
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-oc argo rollouts promote dstrategies-back -n {user}-blue-green
-----
-
-image::rollout-blue-green-step-rollback.png["DStrategies Step Rollback"]
-
-To test the online service, you can use the frontend http://dstrategies-frontend-{user}-blue-green.apps.%CLUSTER%/[URL]
-
-Visit the frontend route via your web browser, push - JUMP- button and ensure the following message is displaying on your screen:
-
-.Frontend Interface
-image::frontend-blue-green-v1.png["Frontend Interface V1.0.0"]
-
-The rollback is done!
