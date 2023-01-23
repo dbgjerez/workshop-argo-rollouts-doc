@@ -212,35 +212,28 @@ image::canary-rollout-step-1.png["Dstrategies Step 1]
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-canary
+oc argo rollouts get rollout film-storage --watch -n {user}-canary
 ----
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-NAME                                  KIND        STATUS     AGE    INFO
-⟳ dstrategies-back                            Rollout     ॥ Paused   3m13s  
-├──# revision:2                                                     
-│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  8s     canary
-│     └──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  8s     ready:1/1
-└──# revision:1                                                     
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m13s  stable
-      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  3m13s  ready:1/1
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m13s  ready:1/1
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m13s  ready:1/1
+NAME                                      KIND         STATUS        AGE    INFO
+⟳ film-storage                            Rollout      ॥ Paused      39m    
+├──# revision:4                                                             
+│  ├──⧉ film-storage-7c455c98c8           ReplicaSet   ✔ Healthy     8m7s   canary
+│  │  └──□ film-storage-7c455c98c8-mz9ks  Pod          ✔ Running     18s    ready:1/1
+│  └──α film-storage-7c455c98c8-4         AnalysisRun  ✔ Successful  13s    ✔ 1
+├──# revision:3                                                             
+│  ├──⧉ film-storage-644f5f6df7           ReplicaSet   ✔ Healthy     39m    stable
+│  │  ├──□ film-storage-644f5f6df7-c7j2r  Pod          ✔ Running     5m39s  ready:1/1
+│  │  ├──□ film-storage-644f5f6df7-mxrsr  Pod          ✔ Running     5m4s   ready:1/1
+│  │  ├──□ film-storage-644f5f6df7-b2c9r  Pod          ✔ Running     4m31s  ready:1/1
+│  │  └──□ film-storage-644f5f6df7-z2rxd  Pod          ✔ Running     4m31s  ready:1/1
+│  └──α film-storage-644f5f6df7-3         AnalysisRun  ✔ Successful  5m34s  ✔ 1
 ----
 
-On the front web page you will have the new version in *25%* of the requests.
-
-New revision:
-
-.Frontend Interface
-image::frontend-canary-v2.png["Frontend Interface"]
-
-Old revision:
-
-.Frontend Interface
-image::frontend-canary-v1.png["Frontend Interface"]
+If we make a lot of requests, we will have the new version in *25%* of the requests.
 
 [#04-step2]
 ### Step 2 - Scale the canary version to 50%
@@ -254,32 +247,24 @@ image::canary-rollout-step-2.png["Dstrategies Step 2"]
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-canary
+oc argo rollouts get rollout film-storage --watch -n {user}-canary
 ----
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-NAME                                  KIND        STATUS     AGE    INFO
-⟳ dstrategies-back                            Rollout     ॥ Paused   3m47s  
-├──# revision:2                                                     
-│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  42s    canary
-│     ├──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  42s    ready:1/1
-│     └──□ dstrategies-back-9dc6f576f-8qppq   Pod         ✔ Running  6s     ready:1/1
-└──# revision:1                                                     
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m47s  stable
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m47s  ready:1/1
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m47s  ready:1/1
+NAME                                      KIND         STATUS        AGE    INFO
+⟳ film-storage                            Rollout      ॥ Paused      40m    
+├──# revision:4                                                             
+│  ├──⧉ film-storage-7c455c98c8           ReplicaSet   ✔ Healthy     8m40s  canary
+│  │  ├──□ film-storage-7c455c98c8-mz9ks  Pod          ✔ Running     51s    ready:1/1
+│  │  └──□ film-storage-7c455c98c8-sdbd6  Pod          ✔ Running     16s    ready:1/1
+│  └──α film-storage-7c455c98c8-4         AnalysisRun  ✔ Successful  46s    ✔ 1
+├──# revision:3                                                             
+│  ├──⧉ film-storage-644f5f6df7           ReplicaSet   ✔ Healthy     40m    stable
+│  │  ├──□ film-storage-644f5f6df7-mxrsr  Pod          ✔ Running     5m37s  ready:1/1
+│  │  └──□ film-storage-644f5f6df7-z2rxd  Pod          ✔ Running     5m4s   ready:1/1
+│  └──α film-storage-644f5f6df7-3         AnalysisRun  ✔ Successful  6m7s   ✔ 1
 ----
-
-New revision:
-
-.Frontend Interface
-image::frontend-canary-v2.png["Frontend Interface"]
-
-Old revision:
-
-.Frontend Interface
-image::frontend-canary-v1.png["Frontend Interface"]
 
 [#04-step3]
 ### Step 3 - Scale the canary version to 100%
@@ -293,85 +278,23 @@ image::canary-rollout-step-3.png["Dstrategies Step 3"]
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-kubectl argo rollouts get rollout dstrategies-back --watch -n {user}-canary
+oc argo rollouts get rollout film-storage --watch -n {user}-canary
 ----
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-NAME                                 KIND        STATUS        AGE    INFO
-⟳ dstrategies-back                           Rollout     ✔ Healthy     4m32s  
-├──# revision:2                                                       
-│  └──⧉ dstrategies-back-9dc6f576f           ReplicaSet  ✔ Healthy     87s    stable
-│     ├──□ dstrategies-back-9dc6f576f-fwq8m  Pod         ✔ Running     87s    ready:1/1
-│     ├──□ dstrategies-back-9dc6f576f-8qppq  Pod         ✔ Running     51s    ready:1/1
-│     ├──□ dstrategies-back-9dc6f576f-5ch92  Pod         ✔ Running     17s    ready:1/1
-│     └──□ dstrategies-back-9dc6f576f-kmvdh  Pod         ✔ Running     17s    ready:1/1
-└──# revision:1                                                       
-   └──⧉ dstrategies-back-67fc9fb79b          ReplicaSet  • ScaledDown  4m32s  
+NAME                                      KIND         STATUS        AGE    INFO
+⟳ film-storage                            Rollout      ✔ Healthy     40m    
+├──# revision:4                                                             
+│  ├──⧉ film-storage-7c455c98c8           ReplicaSet   ✔ Healthy     9m8s   stable
+│  │  ├──□ film-storage-7c455c98c8-mz9ks  Pod          ✔ Running     79s    ready:1/1
+│  │  ├──□ film-storage-7c455c98c8-sdbd6  Pod          ✔ Running     44s    ready:1/1
+│  │  ├──□ film-storage-7c455c98c8-9m2dp  Pod          ✔ Running     9s     ready:1/1
+│  │  └──□ film-storage-7c455c98c8-p4pzq  Pod          ✔ Running     9s     ready:1/1
+│  └──α film-storage-7c455c98c8-4         AnalysisRun  ✔ Successful  74s    ✔ 1
+├──# revision:3                                                             
+│  ├──⧉ film-storage-644f5f6df7           ReplicaSet   • ScaledDown  40m    
+│  └──α film-storage-644f5f6df7-3         AnalysisRun  ✔ Successful  6m35s  ✔ 1
 ----
 
-**We have in the online environment the new version V2.0.0!!!**
-
-New revision:
-
-.Frontend Interface
-image::frontend-canary-v2.png["Frontend Interface"]
-
-[#04-rollback]
-### Rollback
-
-Imagine that something goes wrong, we know that this never happens but just in case. We can do a very *quick rollback* just by undoing the change.
-
-**Argo Rollouts** has an https://argoproj.github.io/argo-rollouts/generated/kubectl-argo-rollouts/kubectl-argo-rollouts_undo/[undo] command to do the rollback. In our opinion, we don't like this procedure because it is not aligned with GitOps. The changes that **Argo Rollouts** do does not come from git, so git is OutOfSync with what we have in Openshift.
-In our case the commit that we have done not only changes the ReplicaSet but also the ConfigMap. The *undo* command only changes the ReplicaSet, so it does not work for us.
-
-We recommend making changes in git rather than in Argo Rollouts. Therefore, we will revert the last commit:
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-git revert HEAD --no-edit
-----
-
-If we just revert the changes in git we will go back to the previous version. But **Argo Rollouts** will take this revert as a new release so it will do it throw the steps that we have configured. We want a *quick rollback* we don't want a step-by-step revert. To achieve the *quick rollback* we will configure **Argo Rollouts** without steps for the rollback.
-
-In the file *./canary/dstrategies-back-rollout.yaml*  under *dstrategies-back* under the *steps*, delete all the steps and only set one step *- setWeight: 100*:
-
-[source,yaml,subs="+macros,+attributes"]
-----
-  strategy:
-    canary:
-      analysis:
-        startingStep: 1
-        templates:
-        - templateName: dstrategies-back-analysis-template
-      steps:
-      - setWeight: 100
-----
-
-Execute those commands to push the changes:
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-git add .
-git commit -m "delete steps for rollback"
-git push
-----
-
-**ArgoCD** will get the changes and apply them. **Argo Rollouts** will create a new revision with the previous version.
-
-The rollback is done!
-
-image::canary-rollout-step-Rollback.png["Dstrategies Step Rollback"]
-
-To test the online service, you can use the frontend http://dstrategies-frontend-{user}-canary.apps.%CLUSTER%/[URL]
-
-Visit the frontend route via your web browser, push - JUMP- button and ensure the following message is displaying on your screen:
-
-.Frontend Interface
-image::frontend-canary.png["Frontend Interface"]
-
-
-To get the application ready for a new release we should configure again the  **Argo Rollouts** with the steps.
 
