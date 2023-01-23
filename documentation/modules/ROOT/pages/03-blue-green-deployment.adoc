@@ -106,7 +106,7 @@ We are going to create the ArgoCD application *film-storage-blue-green*, to appl
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dstrategies-blue-green
+  name: film-storage-blue-green
   namespace: {user}-gitops-argocd
 spec:
   destination:
