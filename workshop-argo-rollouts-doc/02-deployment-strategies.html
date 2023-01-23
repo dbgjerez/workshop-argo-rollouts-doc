@@ -334,13 +334,37 @@
 <h2 id="02-deployment-app"><a class="anchor" href="#02-deployment-app"></a>Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>DStrategies App is a microservice-based application that is composed of a backend microservice based on <a href="https://quarkus.io/">Quarkus</a> and a frontend microservice based on <a href="https://reactjs.org/">React</a>. The idea of this application is to be able to display the backend microservice characteristics based on an HTTP request performed by the frontend.</p>
+<p>The application is a microservice-based application that is composed of a backend microservice based on Golang. The objective application doesn&#8217;t matter, given that we&#8217;re going to test a progressive deployment that must work with whatever stateless application.</p>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/app_arch.png" alt="app arch">
+<div class="paragraph">
+<p>Specifically, this microservice exposes a few endpoints such as its own information or a list of movies:</p>
 </div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top"><strong>Name</strong></th>
+<th class="tableblock halign-center valign-top"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">/api/v1/health</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Healthcheck application</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">/api/v1/info</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Application info as version, name and build date</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">/api/v1/films</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">List of movies</p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
 <p>During this workshop, you will be able to deploy this application using different deployment strategies in order to gain knowledge and skills in managing microservice releases.</p>
 </div>
