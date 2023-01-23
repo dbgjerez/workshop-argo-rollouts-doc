@@ -331,7 +331,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="04-arch"><a class="anchor" href="#04-arch"></a>Generate DStrategies APP GitOps Deployment Model</h2>
+<h2 id="04-arch"><a class="anchor" href="#04-arch"></a>Generate film-storage APP GitOps Deployment Model</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>First of all, it is required to review a set of objects in our forked git repository to configure the deployment correctly for deploying our application following a GitOps model.</p>
@@ -345,7 +345,7 @@
 <p>As you know so well, the Rollout object controls the application deployment. If you look closely, it is possible to find many similarities between an Argo Rollout object and a Kubernetes Deployment. The main difference between the previous objects referenced is the rollout strategy field.</p>
 </div>
 <div class="paragraph">
-<p>Please edit the file named <strong>./canary/dstrategies-back-rollout.yaml</strong> to define <strong>&lt;TIME&gt;</strong> as <strong>30s</strong> and understand the canary deployment strategy:</p>
+<p>Please edit the file named <strong>./canary/film-storage-rollout.yaml</strong> to define <strong>&lt;TIME&gt;</strong> as <strong>30s</strong> and understand the canary deployment strategy:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -354,7 +354,7 @@
       analysis:
         startingStep: 1
         templates:
-        - templateName: dstrategies-back-analysis-template
+        - templateName: film-storage-analysis-template
       steps:
       - setWeight: 10
       - pause:
@@ -368,12 +368,12 @@
 <div class="sect2">
 <h3 id="04-mod"><a class="anchor" href="#04-mod"></a>Modify Analysis Template</h3>
 <div class="paragraph">
-<p>Please edit the file named <strong>./canary/dstrategies-back-analysis-template.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> that helps to reference the user namespace in the healthcheck URL.</p>
+<p>Please edit the file named <strong>./canary/film-storage-analysis-template.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> that helps to reference the user namespace in the healthcheck URL.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  metrics:
-    - name: dstrategies-back-webmetric
+    - name: film-storage-webmetric
       provider:
         web:
           jsonPath: '{$.status}'
@@ -396,24 +396,6 @@ For more information about AnalysisTemplate, please visit the following <a href=
 </div>
 </div>
 <div class="sect2">
-<h3 id="04-url"><a class="anchor" href="#04-url"></a>Modify back service URL</h3>
-<div class="paragraph">
-<p>Finally, it is required to create a <strong>Deployment</strong> object to deploy the frontend application. This application helps us to test the canary rollout strategy from a web interface and see backend information.</p>
-</div>
-<div class="paragraph">
-<p>To allow communication between the frontend and the backend, it is required to edit the file named <strong>./canary/dstrategies-frontend-deployment.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> and <strong>&lt;OCP_DOMAIN&gt;</strong>. You can check their values in the <a href="01-setup.html#01-parameters" class="xref page">parameters chapter</a>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">        env:
-          - name: REACT_APP_BACK
-            value: <a href="http://dstrategies-back-online-&lt;USERNAME&gt;-canary.apps.&lt;OCP_DOMAIN&gt;/dstrategies-back" class="bare">http://dstrategies-back-online-&lt;USERNAME&gt;-canary.apps.&lt;OCP_DOMAIN&gt;/dstrategies-back</a>
-          - name: REACT_APP_CATEGORY
-            value: CANARY</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="04-git"><a class="anchor" href="#04-git"></a>Commit and Push the Changes</h3>
 <div class="paragraph">
 <p>Once all the files are configured correctly, it is time to commit and push all changes to the repository that you have just forked.</p>
@@ -421,7 +403,7 @@ For more information about AnalysisTemplate, please visit the following <a href=
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "Configured DStrategies App deployment files for canary strategy"
+git commit -m "Configured film-storage App deployment files for canary strategy"
 git push</code></pre>
 </div>
 </div>
@@ -429,17 +411,17 @@ git push</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="04-deloy"><a class="anchor" href="#04-deloy"></a>Deploy Dstrategies Application</h2>
+<h2 id="04-deloy"><a class="anchor" href="#04-deloy"></a>Deploy film-storage ArgoCD Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We are going to create the application <strong>dstrategies</strong>, which we will use to test canary deployment. Because we will make changes in the application&#8217;s GitHub repository, we have to use the repository that you have just forked. Please edit the following yaml and set your own GitHub repository in the <strong>reportURL</strong>. Create a file called <strong>application-dstrategies-canary.yaml</strong></p>
+<p>We are going to create the application <strong>film-storage-canary</strong>, which we will use to test canary deployment. Because we will make changes in the application&#8217;s GitHub repository, we have to use the repository that you have just forked. Please edit the following .yaml file, and set your own GitHub repository in the <strong>repoURL</strong>. Create a file called <strong>film-storage-canary.yaml</strong> inside the argocd folder:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dstrategies-canary
+  name: film-storage-canary
   namespace: %USER%-gitops-argocd
 spec:
   destination:
@@ -448,7 +430,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: canary
-    repoURL: <a href="https://github.com/change_me/dstrategies-app-deployment" class="bare">https://github.com/change_me/dstrategies-app-deployment</a>
+    repoURL: <a href="https://github.com/change_me/workshop-argo-rollouts-resources" class="bare">https://github.com/change_me/workshop-argo-rollouts-resources</a>
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -459,15 +441,15 @@ spec:
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc apply -f application-dstrategies-canary.yaml</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc apply -f argocd/film-storage-canary.yaml</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Looking at the Argo CD dashboard, you would notice that we have a new <strong>dstrategies</strong> application.</p>
+<p>Looking at the Argo CD dashboard, you would notice that we have a new <strong>film-storage</strong> application.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/argocd_dstrategies-canary.png" alt="ArgoCD Dstrategies">
+<img src="_images/argocd_dstrategies-canary.png" alt="ArgoCD film-storage-canary strategy">
 </div>
 </div>
 </div>
@@ -489,10 +471,7 @@ spec:
 <div class="ulist">
 <ul>
 <li>
-<p>Routes and Services declared with the suffix -online</p>
-</li>
-<li>
-<p>Routes mapped only to the online services</p>
+<p>Routes and Services</p>
 </li>
 <li>
 <p>Services mapped to the rollout.</p>
@@ -507,51 +486,56 @@ spec:
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage --watch -n %USER%-canary</code></pre>
 </div>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE  INFO
-⟳ dstrategies-back                            Rollout     ✔ Healthy  38s
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                      KIND        STATUS     AGE  INFO
+⟳ film-storage                            Rollout     ✔ Healthy  13m
 └──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  38s  stable
-      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  38s  ready:1/1
-      ├──□ dstrategies-back-67fc9fb79b-7c4jw  Pod         ✔ Running  38s  ready:1/1
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  38s  ready:1/1
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  38s  ready:1/1</code></pre>
+   └──⧉ film-storage-644f5f6df7           ReplicaSet  ✔ Healthy  13m  stable
+      ├──□ film-storage-644f5f6df7-8v25c  Pod         ✔ Running  13m  ready:1/1
+      ├──□ film-storage-644f5f6df7-c6ldl  Pod         ✔ Running  13m  ready:1/1
+      ├──□ film-storage-644f5f6df7-gxxqp  Pod         ✔ Running  13m  ready:1/1
+      └──□ film-storage-644f5f6df7-l5cvj  Pod         ✔ Running  13m  ready:1/1</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>We have defined an active or online service 'dstrategies-back-online'. Final users will always use 'dstrategies-back-online'. When a new version is deployed <strong>Argo Rollouts</strong> creates a new revision (ReplicaSet). The number of replicas in the new release increases based on the information in the steps, and the number of replicas in the old release decreases by the same number. We have configured a pause duration between each step. To learn more about <strong>Argo Rollouts</strong>, please read <a href="https://argoproj.github.io/argo-rollouts/features/canary/">this</a>.</p>
+<p>When a new version is deployed, <strong>Argo Rollouts</strong> creates a new revision (ReplicaSet). The number of replicas in the new release increases based on the information in the steps, and the number of replicas in the old release decreases by the same number. We have configured a pause duration between each step. To learn more about <strong>Argo Rollouts</strong>, please read <a href="https://argoproj.github.io/argo-rollouts/features/canary/">this</a>.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="04-test"><a class="anchor" href="#04-test"></a>Test Dstrategies application</h2>
+<h2 id="04-test"><a class="anchor" href="#04-test"></a>Test film-storage application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We have deployed the <strong>dstrategies</strong> with ArgoCD. We can test that it is up and running.</p>
+<p>We have deployed the <strong>film-storage</strong> with ArgoCD. We can test that it is up and running.</p>
 </div>
 <div class="paragraph">
-<p>To test the online service, you can use the frontend <a href="http://dstrategies-frontend-%USER%-canary.apps.%CLUSTER%/">URL</a></p>
+<p>To test the online service, you can use URL:</p>
 </div>
-<div class="paragraph">
-<p>Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
+<div class="listingblock console-input">
 <div class="content">
-<img src="_images/frontend-canary.png" alt="Frontend Interface">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -s "$(oc get routes film-storage -n %USER%-canary --template='http://{{.spec.host}}')/api/v1/info"</code></pre>
 </div>
-<div class="title">Figure 1. Frontend Interface</div>
 </div>
-<div class="paragraph">
-<p>Notice that in each microservice response we have added metadata information to see better the <strong>version</strong> of each application. This will help us to see the changes while we do the canary deployment.  We can see that the current version is <strong>V1.0.0</strong>.</p>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can use the <code><code>watch</code></code> command to make requests every 2 seconds.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="04-canary"><a class="anchor" href="#04-canary"></a>Dstrategies-back canary deployment</h2>
+<h2 id="04-canary"><a class="anchor" href="#04-canary"></a>film-storage canary deployment</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We have split a <strong>Cloud Native</strong> Canary deployment into three automatic steps:</p>
@@ -573,40 +557,28 @@ spec:
 <p>This is just an example. The key point here is that very easily we can have the canary deployment that better fits our needs. To make this demo faster we have not set a pause without duration in any step, so  <strong>Argo Rollouts</strong> will go throw each step automatically.</p>
 </div>
 <div class="paragraph">
-<p>To test canary deployment we are going to do changes in the backend application dstrategies-back.</p>
+<p>To test canary deployment we are going to do changes in the application.</p>
 </div>
 <div class="sect2">
 <h3 id="04-step1"><a class="anchor" href="#04-step1"></a>Step 1 - Deploy the canary version for 10%</h3>
 <div class="paragraph">
-<p>We will deploy a new version <strong>V2.0.0</strong>. To do it, we have to edit the files <strong>./canary/dstrategies-back-rollout.yaml</strong> and <strong>./canary/dstrategies-back-configmap.yaml</strong> to modify the value <strong>v1.0.0</strong> to <strong>V2.0.0</strong>:</p>
+<p>We will deploy a new version <strong>V2.0.0</strong>. To do it, we have to edit the files <strong>./canary/film-storage-rollout.yaml</strong> to modify the value <strong>0.2</strong> to <strong>0.3</strong>:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">          image: 'quay.io/dseveria/dstrategies-back:V2.0.0' &lt;---</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">          image: quay.io/dborrego/film-storage:0.3 &lt;---</code></pre>
 </div>
+</div>
+<div class="paragraph console-input">
+<p>Before applying these changes, it is important to monitor the current version. To track all canary processes, it is required to the following command to make a request every 500ms</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">  application.version: V2.0.0 &lt;---</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">watch -n0.5 curl -s "$(oc get routes film-storage -n %USER%-canary --template='http://{{.spec.host}}')/api/v1/info"</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Before applying these changes, it is important to monitor the current version via the frontend. To track all canary processes, it is required to prepare the frontend to generate multiple requests.</p>
-</div>
-<div class="paragraph">
-<p>To test the online service, you can use the frontend <a href="http://dstrategies-frontend-%USER%-canary.apps.%CLUSTER%/">URL</a></p>
-</div>
-<div class="paragraph">
-<p>Visit the frontend route via your web browser, edit the number of <strong>Calls Retries</strong> to 10000 and push - JUMP- button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 2. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p><strong>Argo Rollouts</strong> will automatically deploy a new dstrategies-back revision. The canary version will be 10% of the replicas. In this demo, we are not using <a href="https://argoproj.github.io/argo-rollouts/features/traffic-management/">traffic management</a>. <strong>Argo Rollouts</strong> makes a best-effort attempt to achieve the percentage listed in the last setWeight step between the new and old version. This means that it will create only one replica in the new revision because it is rounded up. All the requests are load balanced between the old and the new replicas.</p>
+<p><strong>Argo Rollouts</strong> will automatically deploy a new film-storage revision. The canary version will be 10% of the replicas. In this demo, we are not using <a href="https://argoproj.github.io/argo-rollouts/features/traffic-management/">traffic management</a>. <strong>Argo Rollouts</strong> makes a best-effort attempt to achieve the percentage listed in the last setWeight step between the new and old version. This means that it will create only one replica in the new revision because it is rounded up. All the requests are load balanced between the old and the new replicas.</p>
 </div>
 <div class="paragraph">
 <p>Push the changes to start the deployment.</p>
@@ -614,7 +586,7 @@ spec:
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "Change dstrategies-back version to V2.0.0"
+git commit -m "Change film-storage to version 0.3"
 git push</code></pre>
 </div>
 </div>
@@ -663,7 +635,7 @@ git push</code></pre>
 <div class="content">
 <img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
 </div>
-<div class="title">Figure 3. Frontend Interface</div>
+<div class="title">Figure 1. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p>Old revision:</p>
@@ -672,7 +644,7 @@ git push</code></pre>
 <div class="content">
 <img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
 </div>
-<div class="title">Figure 4. Frontend Interface</div>
+<div class="title">Figure 2. Frontend Interface</div>
 </div>
 </div>
 <div class="sect2">
@@ -714,7 +686,7 @@ git push</code></pre>
 <div class="content">
 <img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
 </div>
-<div class="title">Figure 5. Frontend Interface</div>
+<div class="title">Figure 3. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p>Old revision:</p>
@@ -723,7 +695,7 @@ git push</code></pre>
 <div class="content">
 <img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
 </div>
-<div class="title">Figure 6. Frontend Interface</div>
+<div class="title">Figure 4. Frontend Interface</div>
 </div>
 </div>
 <div class="sect2">
@@ -768,7 +740,7 @@ git push</code></pre>
 <div class="content">
 <img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
 </div>
-<div class="title">Figure 7. Frontend Interface</div>
+<div class="title">Figure 5. Frontend Interface</div>
 </div>
 </div>
 <div class="sect2">
@@ -837,7 +809,7 @@ git push</code></pre>
 <div class="content">
 <img src="_images/frontend-canary.png" alt="Frontend Interface">
 </div>
-<div class="title">Figure 8. Frontend Interface</div>
+<div class="title">Figure 6. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p>To get the application ready for a new release we should configure again the  <strong>Argo Rollouts</strong> with the steps.</p>
