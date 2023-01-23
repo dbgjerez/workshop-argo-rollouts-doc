@@ -608,43 +608,28 @@ git push</code></pre>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage --watch -n %USER%-canary</code></pre>
 </div>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE    INFO
-⟳ dstrategies-back                            Rollout     ॥ Paused   3m13s
-├──# revision:2
-│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  8s     canary
-│     └──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  8s     ready:1/1
-└──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m13s  stable
-      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  3m13s  ready:1/1
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m13s  ready:1/1
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m13s  ready:1/1</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                      KIND         STATUS        AGE    INFO
+⟳ film-storage                            Rollout      ॥ Paused      39m
+├──# revision:4
+│  ├──⧉ film-storage-7c455c98c8           ReplicaSet   ✔ Healthy     8m7s   canary
+│  │  └──□ film-storage-7c455c98c8-mz9ks  Pod          ✔ Running     18s    ready:1/1
+│  └──α film-storage-7c455c98c8-4         AnalysisRun  ✔ Successful  13s    ✔ 1
+├──# revision:3
+│  ├──⧉ film-storage-644f5f6df7           ReplicaSet   ✔ Healthy     39m    stable
+│  │  ├──□ film-storage-644f5f6df7-c7j2r  Pod          ✔ Running     5m39s  ready:1/1
+│  │  ├──□ film-storage-644f5f6df7-mxrsr  Pod          ✔ Running     5m4s   ready:1/1
+│  │  ├──□ film-storage-644f5f6df7-b2c9r  Pod          ✔ Running     4m31s  ready:1/1
+│  │  └──□ film-storage-644f5f6df7-z2rxd  Pod          ✔ Running     4m31s  ready:1/1
+│  └──α film-storage-644f5f6df7-3         AnalysisRun  ✔ Successful  5m34s  ✔ 1</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>On the front web page you will have the new version in <strong>25%</strong> of the requests.</p>
-</div>
-<div class="paragraph">
-<p>New revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 1. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>Old revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 2. Frontend Interface</div>
+<p>If we make a lot of requests, we will have the new version in <strong>25%</strong> of the requests.</p>
 </div>
 </div>
 <div class="sect2">
@@ -662,40 +647,24 @@ git push</code></pre>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage --watch -n %USER%-canary</code></pre>
 </div>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE    INFO
-⟳ dstrategies-back                            Rollout     ॥ Paused   3m47s
-├──# revision:2
-│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  42s    canary
-│     ├──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  42s    ready:1/1
-│     └──□ dstrategies-back-9dc6f576f-8qppq   Pod         ✔ Running  6s     ready:1/1
-└──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m47s  stable
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m47s  ready:1/1
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m47s  ready:1/1</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                      KIND         STATUS        AGE    INFO
+⟳ film-storage                            Rollout      ॥ Paused      40m
+├──# revision:4
+│  ├──⧉ film-storage-7c455c98c8           ReplicaSet   ✔ Healthy     8m40s  canary
+│  │  ├──□ film-storage-7c455c98c8-mz9ks  Pod          ✔ Running     51s    ready:1/1
+│  │  └──□ film-storage-7c455c98c8-sdbd6  Pod          ✔ Running     16s    ready:1/1
+│  └──α film-storage-7c455c98c8-4         AnalysisRun  ✔ Successful  46s    ✔ 1
+├──# revision:3
+│  ├──⧉ film-storage-644f5f6df7           ReplicaSet   ✔ Healthy     40m    stable
+│  │  ├──□ film-storage-644f5f6df7-mxrsr  Pod          ✔ Running     5m37s  ready:1/1
+│  │  └──□ film-storage-644f5f6df7-z2rxd  Pod          ✔ Running     5m4s   ready:1/1
+│  └──α film-storage-644f5f6df7-3         AnalysisRun  ✔ Successful  6m7s   ✔ 1</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>New revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 3. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>Old revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 4. Frontend Interface</div>
 </div>
 </div>
 <div class="sect2">
@@ -713,106 +682,24 @@ git push</code></pre>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">kubectl argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage --watch -n %USER%-canary</code></pre>
 </div>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                 KIND        STATUS        AGE    INFO
-⟳ dstrategies-back                           Rollout     ✔ Healthy     4m32s
-├──# revision:2
-│  └──⧉ dstrategies-back-9dc6f576f           ReplicaSet  ✔ Healthy     87s    stable
-│     ├──□ dstrategies-back-9dc6f576f-fwq8m  Pod         ✔ Running     87s    ready:1/1
-│     ├──□ dstrategies-back-9dc6f576f-8qppq  Pod         ✔ Running     51s    ready:1/1
-│     ├──□ dstrategies-back-9dc6f576f-5ch92  Pod         ✔ Running     17s    ready:1/1
-│     └──□ dstrategies-back-9dc6f576f-kmvdh  Pod         ✔ Running     17s    ready:1/1
-└──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b          ReplicaSet  • ScaledDown  4m32s</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                      KIND         STATUS        AGE    INFO
+⟳ film-storage                            Rollout      ✔ Healthy     40m
+├──# revision:4
+│  ├──⧉ film-storage-7c455c98c8           ReplicaSet   ✔ Healthy     9m8s   stable
+│  │  ├──□ film-storage-7c455c98c8-mz9ks  Pod          ✔ Running     79s    ready:1/1
+│  │  ├──□ film-storage-7c455c98c8-sdbd6  Pod          ✔ Running     44s    ready:1/1
+│  │  ├──□ film-storage-7c455c98c8-9m2dp  Pod          ✔ Running     9s     ready:1/1
+│  │  └──□ film-storage-7c455c98c8-p4pzq  Pod          ✔ Running     9s     ready:1/1
+│  └──α film-storage-7c455c98c8-4         AnalysisRun  ✔ Successful  74s    ✔ 1
+├──# revision:3
+│  ├──⧉ film-storage-644f5f6df7           ReplicaSet   • ScaledDown  40m
+│  └──α film-storage-644f5f6df7-3         AnalysisRun  ✔ Successful  6m35s  ✔ 1</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p><strong>We have in the online environment the new version V2.0.0!!!</strong></p>
-</div>
-<div class="paragraph">
-<p>New revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 5. Frontend Interface</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="04-rollback"><a class="anchor" href="#04-rollback"></a>Rollback</h3>
-<div class="paragraph">
-<p>Imagine that something goes wrong, we know that this never happens but just in case. We can do a very <strong>quick rollback</strong> just by undoing the change.</p>
-</div>
-<div class="paragraph">
-<p><strong>Argo Rollouts</strong> has an <a href="https://argoproj.github.io/argo-rollouts/generated/kubectl-argo-rollouts/kubectl-argo-rollouts_undo/">undo</a> command to do the rollback. In our opinion, we don&#8217;t like this procedure because it is not aligned with GitOps. The changes that <strong>Argo Rollouts</strong> do does not come from git, so git is OutOfSync with what we have in Openshift.
-In our case the commit that we have done not only changes the ReplicaSet but also the ConfigMap. The <strong>undo</strong> command only changes the ReplicaSet, so it does not work for us.</p>
-</div>
-<div class="paragraph">
-<p>We recommend making changes in git rather than in Argo Rollouts. Therefore, we will revert the last commit:</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git revert HEAD --no-edit</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If we just revert the changes in git we will go back to the previous version. But <strong>Argo Rollouts</strong> will take this revert as a new release so it will do it throw the steps that we have configured. We want a <strong>quick rollback</strong> we don&#8217;t want a step-by-step revert. To achieve the <strong>quick rollback</strong> we will configure <strong>Argo Rollouts</strong> without steps for the rollback.</p>
-</div>
-<div class="paragraph">
-<p>In the file <strong>./canary/dstrategies-back-rollout.yaml</strong>  under <strong>dstrategies-back</strong> under the <strong>steps</strong>, delete all the steps and only set one step <strong>- setWeight: 100</strong>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  strategy:
-    canary:
-      analysis:
-        startingStep: 1
-        templates:
-        - templateName: dstrategies-back-analysis-template
-      steps:
-      - setWeight: 100</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Execute those commands to push the changes:</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "delete steps for rollback"
-git push</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>ArgoCD</strong> will get the changes and apply them. <strong>Argo Rollouts</strong> will create a new revision with the previous version.</p>
-</div>
-<div class="paragraph">
-<p>The rollback is done!</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/canary-rollout-step-Rollback.png" alt="Dstrategies Step Rollback">
-</div>
-</div>
-<div class="paragraph">
-<p>To test the online service, you can use the frontend <a href="http://dstrategies-frontend-%USER%-canary.apps.%CLUSTER%/">URL</a></p>
-</div>
-<div class="paragraph">
-<p>Visit the frontend route via your web browser, push - JUMP- button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 6. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>To get the application ready for a new release we should configure again the  <strong>Argo Rollouts</strong> with the steps.</p>
 </div>
 </div>
 </div>
