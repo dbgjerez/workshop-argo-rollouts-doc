@@ -6,9 +6,20 @@ The following sections provide an overall vision of the application that will be
 [#02-deployment-app]
 == Application
 
-DStrategies App is a microservice-based application that is composed of a backend microservice based on https://quarkus.io/[Quarkus] and a frontend microservice based on https://reactjs.org/[React]. The idea of this application is to be able to display the backend microservice characteristics based on an HTTP request performed by the frontend.
+The application is a microservice-based application that is composed of a backend microservice based on Golang. The objective application doesn't matter, given that we're going to test a progressive deployment that must work with whatever stateless application. 
 
-image::app_arch.png[]
+Specifically, this microservice exposes a few endpoints such as its own information or a list of movies:
+
+[cols="2*^,2*.",options="header,+attributes"]
+|===
+|**Name**|**Description**
+| /api/v1/health
+| Healthcheck application
+| /api/v1/info
+| Application info as version, name and build date
+| /api/v1/films
+| List of movies
+|===
 
 During this workshop, you will be able to deploy this application using different deployment strategies in order to gain knowledge and skills in managing microservice releases. 
 
