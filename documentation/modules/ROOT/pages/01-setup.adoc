@@ -162,7 +162,7 @@ Following the GitOps practices, all the deployment configuration is stored in th
 
 Please fork the repository and clone it in your local machine to have full autonomy to make changes and deploy applications. In order to complete this task, follow the next steps:
 
-* Access the https://github.com/rhte2023-argo-rollouts/dstrategies-app-deployment[DStrategy App Deployment] repository. 
+* Access the https://github.com/dbgjerez/workshop-argo-rollouts-resources[workshop-argo-rollouts-resources] repository. 
 
 * Fork it on your GitHub account. If prompted, choose to fork only the `main` branch.
 
