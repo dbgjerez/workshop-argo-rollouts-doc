@@ -4,7 +4,7 @@ include::_attributes.adoc[]
 The following sections provide an overall vision of the application that will be used during this laboratory and the respective deployment strategies that will be reviewed during the workshop.
 
 [#02-deployment-app]
-== Application
+== Application film-storage
 
 The application is a microservice-based application that is composed of a backend microservice based on Golang. The objective application doesn't matter, given that we're going to test a progressive deployment that must work with whatever stateless application. 
 

@@ -8,7 +8,7 @@ To achieve Blue/Green deployment with *Cloud Native* applications using **Argo R
 
 This is the initial situation after deploying the application:
 
-image::rollout-blue-green-step-0.png["DStrategies initial status"]
+image::rollout-blue-green-step-0.png["Initial status"]
 
 OpenShift Components - Online
 
