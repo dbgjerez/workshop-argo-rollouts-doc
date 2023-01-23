@@ -2,7 +2,7 @@
 include::_attributes.adoc[]
 
 [#03-arch]
-== Application architecture
+== film-storage architecture
 
 To achieve Blue/Green deployment with *Cloud Native* applications using **Argo Rollouts**, we have designed this architecture.
 
@@ -22,10 +22,10 @@ OpenShift Components - Offline
 - Routes mapped only to the offline services.
 - Services mapped to pods created by the rollout.
 
-We will define an active or online service 'dstrategies-back-online' and a preview or offline service 'dstrategies-back-offline'. The idea is that the frontend will always use 'dstrategies-back-online' and 'dstrategies-back-offline' will only be used to test our service before triggering the rollout.
+We will define an active or online service 'film-storage-online' and a preview or offline service 'film-storage-offline'. The idea is that the frontend will always use 'film-storage-online' and 'film-storage-offline' will only be used to test our service before triggering the rollout.
 
 [#03-dmodel]
-== Generate DStrategies APP GitOps Deployment Model
+== Generate film-storage APP GitOps Deployment Model
 
 First of all, it is required to review a set of objects in our forked git repository to configure the deployment correctly for deploying our application following a GitOps model.
 
@@ -34,16 +34,16 @@ Please follow the next section to understand the required objects and configurat
 [#03-reviewsvc]
 === Review Services
 
-As the previous picture shows, it is required to generate a couple of services that will be used to redirect the traffic to the correct DStrategies App version. 
+As the previous picture shows, it is required to generate a couple of services that will be used to redirect the traffic to the correct application version. 
 
-Please take a look at the files *./blue-green/dstrategies-back-service-online.yaml* and *./blue-green/dstrategies-back-service-offline.yaml* to understand the objects and get the names of these elements.
+Please take a look at the files *./blue-green/film-storage-service-offline.yaml* and *./blue-green/film-storage-service-online.yaml* to understand the objects and get the names of these elements.
 
 [#03-rollout]
 === Modify Rollout strategy
 
 The Rollout object controls the application deployment. If you look closely, it is possible to find many similarities between an Argo Rollout object and a Kubernetes Deployment. The main difference between the previous objects referenced is the rollout strategy field. 
 
-Please edit the file named *./blue-green/dstrategies-back-rollout.yaml* in order to add the required **<SERVICE_OFFLINE>** and **<SERVICE_ONLINE>** service names:
+Please edit the file named *./blue-green/film-storage-back-rollout.yaml* in order to add the required **<SERVICE_OFFLINE>** and **<SERVICE_ONLINE>** service names:
 
 [source,yaml,subs="+macros,+attributes"]
 ----
@@ -51,48 +51,36 @@ Please edit the file named *./blue-green/dstrategies-back-rollout.yaml* in order
     blueGreen:
       activeService: <SERVICE_ONLINE>
       autoPromotionEnabled: false
-      prePromotionAnalysis:
-        templates:
-          - templateName: dstrategies-back-analysis-template
       previewService: <SERVICE_OFFLINE>
 ----
 
 [#03-anatemp]
 === Modify Analysis Template 
 
-We have created an AnalysisTemplate 'dstrategies-back-analysis-template' that just validates the health of the application, for production environments a better analysis should be done. **Argo Rollouts** uses this AnalysisTemplate to validate a new version and set whether it is ready to be promoted or not.
+We have created an AnalysisTemplate 'film-storage-analysis-template' that just validates the health of the application, for production environments a better analysis should be done. **Argo Rollouts** uses this AnalysisTemplate to validate a new version and set whether it is ready to be promoted or not.
 
-Please edit the file named *./blue-green/dstrategies-back-analysis-template.yaml* to add the required **<USERNAME>** that helps to reference the user namespace in the healthcheck URL.
+Please edit the file named *./blue-green/film-storage-analysis-template.yaml* to add the required **<USERNAME>** that helps to reference the user namespace in the healthcheck URL.
 
 [source,yaml,subs="+macros,+attributes"]
 ----
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  labels:
+    app: film-storage
+  name: film-storage-analysis-template
+spec:
   metrics:
-    - name: dstrategies-back-webmetric
+    - name: film-storage-webmetric
       provider:
         web:
           jsonPath: '{$.status}'
           url: >-
-            http://dstrategies-back-offline.<USERNAME>-blue-green.svc.cluster.local:8080/q/health/ready
+            http://film-storage-offline.<USERNAME>-blue-green.svc.cluster.local:8080/api/v1/health
       successCondition: result == 'UP'
 ----
 
 NOTE: For more information about AnalysisTemplate, please visit the following https://argoproj.github.io/argo-rollouts/features/bluegreen/[link].
-
-[#03-backurl]
-=== Modify back service URL
-
-Finally, it is required to create a **Deployment** object to deploy the frontend application. This application helps us to test the blue-green rollout strategy from a web interface and see backend information.
-
-To allow communication between the frontend and the backend, it is required to edit the file named *./blue-green/dstrategies-frontend-deployment.yaml* to add the required **<USERNAME>** and **<OCP_DOMAIN>**. You can check their values in the xref:01-setup.adoc#01-parameters[parameters chapter].
-
-[source,yaml,subs="+macros,+attributes"]
-----
-        env:  
-          - name: REACT_APP_BACK
-            value: http://dstrategies-back-online-<USERNAME>-blue-green.apps.<OCP_DOMAIN>/dstrategies-back
-          - name: REACT_APP_CATEGORY
-            value: BLUE-GREEN
-----
 
 [#03-commit]
 === Commit and Push the Changes
@@ -103,7 +91,7 @@ Once all the files are configured correctly, it is time to commit and push all c
 [source,input,subs="+macros,+attributes"]
 ----
 git add .
-git commit -m "Configured DStrategies App deployment files"
+git commit -m "Configured film-storage blue/green deployment files"
 git push
 ----
 
