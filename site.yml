@@ -3,7 +3,7 @@ runtime:
 
 site:
   title: "RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts"
-  url: https://github.com/rhte2023-argo-rollouts/redhat-workshop-deployment-strategies
+  url: https://github.com/dbgjerez/workshop-argo-rollouts-doc
   start_page: redhat-workshop-deployment-strategies::index.adoc
 
 
@@ -12,7 +12,7 @@ content:
     # - url: ./
     #   start_path: documentation
     #Change to make url parameters work EX: USER
-    - url: git@github.com:rhte2023-argo-rollouts/redhat-workshop-deployment-strategies.git
+    - url: git@github.com:dbgjerez/workshop-argo-rollouts-doc.git
       tags: []
       branches: [master]
       start_path: documentation
