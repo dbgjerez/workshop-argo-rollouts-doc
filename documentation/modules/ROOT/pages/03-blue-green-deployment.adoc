@@ -4,8 +4,6 @@ include::_attributes.adoc[]
 [#03-arch]
 == Application architecture
 
-As mentioned before, we have a very simple application with two services. One frontal React app called *dstrategies-front* and one backend Quarkus app called *dstrategies-back*. We will use the front app to call several times the back app and see how the back version changes during the deployment.
-
 To achieve Blue/Green deployment with *Cloud Native* applications using **Argo Rollouts**, we have designed this architecture.
 
 This is the initial situation after deploying the application:
