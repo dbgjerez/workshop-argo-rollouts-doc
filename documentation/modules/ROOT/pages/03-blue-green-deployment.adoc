@@ -98,7 +98,7 @@ git push
 [#03-argo]
 == Argo CD Application
 
-We are going to create the application *DStrategies* to apply the files modified previously to test Blue/Green deployment. Please edit the following yaml and set your own GitHub repository in the *reportURL*. Create a file called *application-dstrategies-blue-green.yaml*
+We are going to create the ArgoCD application *film-storage-blue-green*, to apply the files modified previously to test Blue/Green deployment. Please, edit the .yaml file named *./argocd/film-storage-blue-green.yaml*, and set your own GitHub repository in the *repoURL*.
 
 [.console-input]
 [source,input,yaml,subs="+macros,+attributes"]
@@ -115,7 +115,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: blue-green
-    repoURL: https://github.com/change_me/dstrategies-app-deployment
+    repoURL: https://github.com/change_me/workshop-argo-rollouts-resources
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -127,52 +127,63 @@ spec:
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc apply -f application-dstrategies-blue-green.yaml
+oc apply -f argocd/film-storage-blue-green.yaml 
+application.argoproj.io/film-storage-blue-green created
 ----
 
-Looking at the Argo CD dashboard, you would notice that we have a new *DStrategies* application.
+Looking at the Argo CD dashboard, you would notice that we have a new *film-storage-blue-green* application.
 
-image::argocd_dstrategies-blue-green.png["ArgoCD DStrategies"]
+image::argocd_dstrategies-blue-green.png["film-storage-blue-green"]
 
 NOTE: It is important to wait for *Healthy* and *Synced* status in the Argo CD Application
 
 [#03-test]
-== Test Dstrategies application
+== Test film-storage application
  
-We have deployed the *DStrategies* with ArgoCD. We can test the online and offline services to ensure that they are up and running.
+We have deployed the *film-storage* with ArgoCD. We can test the online and offline services to ensure that they are up and running.
 
-To test the online service, it is required to extract the frontend URL:
+To test the online service, it is required to extract the URL:
 
 [.lines_space]
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-oc get route dstrategies-frontend -n {user}-blue-green -o jsonpath='{.spec.host}'
+oc get route film-storage-online -n {user}-blue-green -o jsonpath='{.spec.host}'
 ----
 
-Or you can use this http://dstrategies-frontend-{user}-blue-green.apps.%CLUSTER%/[URL]
+In addition, regarding testing the offline service, it is required to get the offline route:
 
-Visit the frontend via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:
+[.lines_space]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+oc get route film-storage-offline -n {user}-blue-green -o jsonpath='{.spec.host}'
+----
 
-.Frontend Interface
-image::frontend-blue-green.png["Frontend Interface"]
-
-In addition, regarding testing the offline service, it is required to get the Offline route:
+We can test the endpoint with the following request:
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-curl "$(oc get routes dstrategies-back-offline -n {user}-blue-green --template='http://{{.spec.host}}')/dstrategies-back"
+curl -s $(oc get route film-storage-offline -n {user}-blue-green -o jsonpath='{.spec.host}')/api/v1/info | json_pp
 ----
+
+The result: 
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-{"metadata":{"version":"V1.0.0","colour":"Green"}}
+{
+   "app" : {
+      "buildTime" : "2023/01/10 15:17:57",
+      "name" : "film-storage",
+      "version" : "0.2"
+   }
+}
 ----
 
 Notice that in each microservice response we have added metadata information to see better the *version* of each application. This will help us to see the changes while we do the Blue/Green deployment.
-Because right now we have both routers against the same rollout revision we will have the same response with version *V1.0.0*:
+Because right now we have both routers against the same rollout revision we will have the same response with version *0.2*:
 
 We can also see the rollout's status.
 
@@ -181,48 +192,41 @@ TIP: Argo Rollouts offers a Kubectl plugin to enrich the experience with Rollout
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-blue-green
+oc argo rollouts get rollout film-storage-blue-green --watch -n {user}-blue-green
 ----
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-NAME                                  KIND        STATUS     AGE INFO
-⟳ dstrategies-back                            Rollout     ✔ Healthy  12m  
-└──# revision:1                                                   
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  12m  stable,active
-      └──□ dstrategies-back-67fc9fb79b-49k25  Pod         ✔ Running  12m  ready:1/1
+NAME                                                 KIND        STATUS     AGE  INFO
+⟳ film-storage-blue-green                            Rollout     ✔ Healthy  60s  
+└──# revision:1                                                                  
+   └──⧉ film-storage-blue-green-644f5f6df7           ReplicaSet  ✔ Healthy  47s  stable,active
+      └──□ film-storage-blue-green-644f5f6df7-bhq6z  Pod         ✔ Running  46s  ready:1/1
 ----
 
 [#03-deploy]
-== DStrategies-back Blue/Green deployment
+== film-storage Blue/Green deployment
 
 We have split a *Cloud Native* Blue/Green deployment into two steps:
 
 1. Deploy a new version.
 2. Promote a new version
  
-To test Blue/Green deployment we are going to do changes in the backend application *dstrategies-back*.
+To test Blue/Green deployment we are going to do changes in the backend application *film-storage*.
  
-We already deployed the *dstrategies-back* version V1.0.0, and we have a new dstrategies-back version V2.0.0 ready to be deployed. 
+We already deployed the *film-storage* version 0.2, and we have a new film-storage version 0.3 ready to be deployed. 
 
 [#03-step1]
 === Step 1 - Deploy a new version
- 
-We will deploy a new version *V2.0.0*. To do so, we have to edit the files *./blue-green/dstrategies-back-rollout.yaml* and *./blue-green/dstrategies-back-configmap.yaml* to modify the value *V1.0.0* to *V2.0.0*:
 
-../blue-green/dstrategies-back-rollout.yaml
+We will deploy a new version *0.3*. To do so, we have to edit the files *./blue-green/film-storage-back-rollout.yaml* to modify the value *0.2* to *0.3*:
+
+../blue-green/film-storage-back-rollout.yaml
 [.console-input]
 [source,input,yaml,subs="+macros,+attributes"]
 ----
-          image: 'quay.io/dseveria/dstrategies-back:V2.0.0' <---
-----
-
-../blue-green/dstrategies-back-configmap.yaml
-[.console-input]
-[source,input,yaml,subs="+macros,+attributes"]
-----
-  application.version: V2.0.0 <---
+          image: quay.io/dborrego/film-storage:0.2 <---
 ----
 
 And push the changes
@@ -231,32 +235,32 @@ And push the changes
 [source,input,subs="+macros,+attributes"]
 ----
 git add .
-git commit -m "Change dstrategies-back version to V2.0.0"
+git commit -m "Change film-storage version to 0.3"
 git push
 ----
 
 ArgoCD will refresh the status after some minutes. If you don't want to wait you can refresh it manually from ArgoCD UI.
 
-image::argocd-Dstrategies-blue-green-Refresh.png["Refresh DStrategies"]
+image::argocd-Dstrategies-blue-green-Refresh.png["Refresh film-storage blue/green"]
  
-**Argo Rollouts** will automatically deploy the new dstrategies-back version and execute the *prePromotionAnalysis*. 
+**Argo Rollouts** will automatically deploy the new film-storage version and execute the *prePromotionAnalysis*. 
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-blue-green
-NAME                                  KIND         STATUS        AGE  INFO
-⟳ dstrategies-back                            Rollout      ॥ Paused      27m  
-├──# revision:2                                                       
-│  ├──⧉ dstrategies-back-9dc6f576f            ReplicaSet   ✔ Healthy     36s  preview
-│  │  └──□ dstrategies-back-9dc6f576f-6vqp5   Pod          ✔ Running     36s  ready:1/1
-│  └──α dstrategies-back-9dc6f576f-2-pre      AnalysisRun  ✔ Successful  31s  ✔ 1
-└──# revision:1                                                       
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet   ✔ Healthy     27m  stable,active
-      └──□ dstrategies-back-67fc9fb79b-49k25  Pod          ✔ Running     27m  ready:1/1
+oc argo rollouts get rollout film-storage-blue-green --watch -n {user}-blue-green
+NAME                                                 KIND         STATUS        AGE    INFO
+⟳ film-storage-blue-green                            Rollout      ॥ Paused      19m    
+├──# revision:6                                                                        
+│  ├──⧉ film-storage-blue-green-7c455c98c8           ReplicaSet   ✔ Healthy     4m36s  preview
+│  │  └──□ film-storage-blue-green-7c455c98c8-m7bwh  Pod          ✔ Running     36s    ready:1/1
+│  └──α film-storage-blue-green-7c455c98c8-6-pre     AnalysisRun  ✔ Successful  27s    ✔ 1
+└──# revision:5                                                                        
+   └──⧉ film-storage-blue-green-644f5f6df7           ReplicaSet   ✔ Healthy     19m    stable,active
+      └──□ film-storage-blue-green-644f5f6df7-bhq6z  Pod          ✔ Running     19m    ready:1/1
 ----
   
-If the *prePromotionAnalysis* goes well, we can see that offline applications have version V2.0.0 and the new attribute description, but the online version has not changed.
+If the *prePromotionAnalysis* goes well, we can see that offline applications have version 0.3 and the new attribute description, but the online version has not changed.
 
 This is our current status:
 
