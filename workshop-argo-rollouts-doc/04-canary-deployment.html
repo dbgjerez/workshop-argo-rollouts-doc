@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Canary deployment strategy :: RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts</title>
+    <link rel="canonical" href="https://github.com/dbgjerez/workshop-argo-rollouts-doc/workshop-argo-rollouts-doc/04-canary-deployment.html">
+    <link rel="prev" href="03-blue-green-deployment.html">
+    <link rel="next" href="05-canary-deployment-service-mesh.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="../_/img/header_logo.png" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://github.com/dbgjerez/workshop-argo-rollouts-doc">RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="workshop-argo-rollouts-doc" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">Workshop</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html">1. Environment Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#01-prerequisites">1.1 Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html#01-laboratory">1.2 Laboratory</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-parameters">1.2.1 Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-accessconsole">1.2.2 Access - OCP Console</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-accesscli">1.2.3 Access - OCP CLI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-accessArgoCD">1.2.4 Access - ArgoCD dashboard</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-cloneGit">1.2.5 Clone the GitOps repository</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#01-clusterSetup">1.3 Cluster Setup</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html">2. Deployment Strategies with Argo CD and Argo Rollouts</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deployment-strategies.html#02-dstrategies-app">2.1 DStrategies App</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html#02-deployment-strategies">2.2 Deployment Strategies</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-micro-arch">2.2.1 Microservices Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-cd">2.2.2 Continuous Delivery</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-pd">2.2.3 Progressive Delivery</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html#02-argo-rollouts">2.2.4 Argo Rollouts</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="02-deployment-strategies.html#02-bg">2.2.4.1 Blue/Green Deployment</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="02-deployment-strategies.html#02-canary">2.2.4.2 Canary Deployment</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html">3. Blue/Green deployment strategy</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-arch">3.1 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html#03-dmodel">3.2 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-reviewsvc">3.2.1 Review Services</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-rollout">3.2.2 Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-anatemp">3.2.3 Modify Analysis Template</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-backurl">3.2.4 Modify back service URL</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-commit">3.2.5 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-argo">3.3 Argo CD Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-test">3.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html#03-deploy">3.5 DStrategies-back Blue/Green deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-step1">3.5.1 Step 1 - Deploy a new version</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-step2">3.5.2 Step 2 - Promote a new version</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-rollback">3.5.3 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-canary-deployment.html">4. Canary deployment strategy</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#04-arch">4.1 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-review">4.1.1 Review and Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-mod">4.1.2 Modify Analysis Template</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-url">4.1.3 Modify back service URL</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-git">4.1.4 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#04-delpoy">4.2 Deploy Dstrategies Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#04-app">4.3 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#04-test">4.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#04-canary">4.5 Dstrategies-back canary deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-step1">4.5.1 Step 1 - Deploy the canary version for 10%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-step2">4.5.2 Step 2 - Scale the canary version to 50%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-step3">4.5.3 Step 3 - Scale the canary version to 100%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#04-rollback">4.5.4 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html">5. Canary deployment strategy with Service Mesh</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-arch">5.1 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-review">5.1.1 Review and Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-helm">5.1.2 Modify Helm values</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-prometheus">5.1.3 Obtain Red Hat Service Mesh Prometheus Password</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-git">5.1.4 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-deploy">5.2 Deploy Dstrategies Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-app">5.3 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-test">5.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-canary">5.5 Dstrategies-back canary deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-rollback">5.5.1 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Workshop</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Workshop</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Workshop</a></li>
+    <li><a href="04-canary-deployment.html">4. Canary deployment strategy</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/dbgjerez/workshop-argo-rollouts-doc/edit/master/documentation/modules/ROOT/pages/04-canary-deployment.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Canary deployment strategy</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>As mentioned before, a canary deployment is a strategy where the operator releases a new version of their application to a small percentage of the production traffic. This small percentage may test the new version and provide feedback. If the new version is working well the operator may increase the percentage, till all the traffic is using the new version.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-arch"><a class="anchor" href="#04-arch"></a>Generate DStrategies APP GitOps Deployment Model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First of all, it is required to review a set of objects in our forked git repository to configure the deployment correctly for deploying our application following a GitOps model.</p>
+</div>
+<div class="paragraph">
+<p>Please follow the next section to understand the required objects and configurations.</p>
+</div>
+<div class="sect2">
+<h3 id="04-review"><a class="anchor" href="#04-review"></a>Review and Modify Rollout strategy</h3>
+<div class="paragraph">
+<p>As you know so well, the Rollout object controls the application deployment. If you look closely, it is possible to find many similarities between an Argo Rollout object and a Kubernetes Deployment. The main difference between the previous objects referenced is the rollout strategy field.</p>
+</div>
+<div class="paragraph">
+<p>Please edit the file named <strong>./canary/dstrategies-back-rollout.yaml</strong> to define <strong>&lt;TIME&gt;</strong> as <strong>30s</strong> and understand the canary deployment strategy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  strategy:
+    canary:
+      analysis:
+        startingStep: 1
+        templates:
+        - templateName: dstrategies-back-analysis-template
+      steps:
+      - setWeight: 10
+      - pause:
+          duration: &lt;TIME&gt;
+      - setWeight: 50
+      - pause:
+          duration: &lt;TIME&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-mod"><a class="anchor" href="#04-mod"></a>Modify Analysis Template</h3>
+<div class="paragraph">
+<p>Please edit the file named <strong>./canary/dstrategies-back-analysis-template.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> that helps to reference the user namespace in the healthcheck URL.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  metrics:
+    - name: dstrategies-back-webmetric
+      provider:
+        web:
+          jsonPath: '{$.status}'
+          url: &gt;-
+            <a href="http://dstrategies-back-online.&lt;USERNAME&gt;-canary.svc.cluster.local:8080/q/health/ready" class="bare">http://dstrategies-back-online.&lt;USERNAME&gt;-canary.svc.cluster.local:8080/q/health/ready</a>
+      successCondition: result == 'UP'</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For more information about AnalysisTemplate, please visit the following <a href="https://argoproj.github.io/argo-rollouts/features/analysis/">link</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-url"><a class="anchor" href="#04-url"></a>Modify back service URL</h3>
+<div class="paragraph">
+<p>Finally, it is required to create a <strong>Deployment</strong> object to deploy the frontend application. This application helps us to test the canary rollout strategy from a web interface and see backend information.</p>
+</div>
+<div class="paragraph">
+<p>To allow communication between the frontend and the backend, it is required to edit the file named <strong>./canary/dstrategies-frontend-deployment.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> and <strong>&lt;OCP_DOMAIN&gt;</strong>. You can check their values in the <a href="01-setup.html#01-parameters" class="xref page">parameters chapter</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">        env:
+          - name: REACT_APP_BACK
+            value: <a href="http://dstrategies-back-online-&lt;USERNAME&gt;-canary.apps.&lt;OCP_DOMAIN&gt;/dstrategies-back" class="bare">http://dstrategies-back-online-&lt;USERNAME&gt;-canary.apps.&lt;OCP_DOMAIN&gt;/dstrategies-back</a>
+          - name: REACT_APP_CATEGORY
+            value: CANARY</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-git"><a class="anchor" href="#04-git"></a>Commit and Push the Changes</h3>
+<div class="paragraph">
+<p>Once all the files are configured correctly, it is time to commit and push all changes to the repository that you have just forked.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
+git commit -m "Configured DStrategies App deployment files for canary strategy"
+git push</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-deloy"><a class="anchor" href="#04-deloy"></a>Deploy Dstrategies Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are going to create the application <strong>dstrategies</strong>, which we will use to test canary deployment. Because we will make changes in the application&#8217;s GitHub repository, we have to use the repository that you have just forked. Please edit the following yaml and set your own GitHub repository in the <strong>reportURL</strong>. Create a file called <strong>application-dstrategies-canary.yaml</strong></p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dstrategies-canary
+  namespace: %USER%-gitops-argocd
+spec:
+  destination:
+    name: ''
+    namespace: %USER%-canary
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: canary
+    repoURL: <a href="https://github.com/change_me/dstrategies-app-deployment" class="bare">https://github.com/change_me/dstrategies-app-deployment</a>
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc apply -f application-dstrategies-canary.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Looking at the Argo CD dashboard, you would notice that we have a new <strong>dstrategies</strong> application.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd_dstrategies-canary.png" alt="ArgoCD Dstrategies">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-app"><a class="anchor" href="#04-app"></a>Application architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To achieve canary deployment with <strong>Cloud Native</strong> applications using <strong>Argo Rollouts</strong>, we have designed this architecture.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/canary-rollout-step-0.png" alt="Dstrategies initial status">
+</div>
+</div>
+<div class="paragraph">
+<p>OpenShift Components - Online</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Routes and Services declared with the suffix -online</p>
+</li>
+<li>
+<p>Routes mapped only to the online services</p>
+</li>
+<li>
+<p>Services mapped to the rollout.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In Blue/Green deployment we always have an offline service to test the version that is not in production. In the case of canary deployment, we do not need it because progressively we will have the new version in production.</p>
+</div>
+<div class="paragraph">
+<p>We can also see the rollout&#8217;s status.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE  INFO
+⟳ dstrategies-back                            Rollout     ✔ Healthy  38s
+└──# revision:1
+   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  38s  stable
+      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  38s  ready:1/1
+      ├──□ dstrategies-back-67fc9fb79b-7c4jw  Pod         ✔ Running  38s  ready:1/1
+      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  38s  ready:1/1
+      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  38s  ready:1/1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We have defined an active or online service 'dstrategies-back-online'. Final users will always use 'dstrategies-back-online'. When a new version is deployed <strong>Argo Rollouts</strong> creates a new revision (ReplicaSet). The number of replicas in the new release increases based on the information in the steps, and the number of replicas in the old release decreases by the same number. We have configured a pause duration between each step. To learn more about <strong>Argo Rollouts</strong>, please read <a href="https://argoproj.github.io/argo-rollouts/features/canary/">this</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-test"><a class="anchor" href="#04-test"></a>Test Dstrategies application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We have deployed the <strong>dstrategies</strong> with ArgoCD. We can test that it is up and running.</p>
+</div>
+<div class="paragraph">
+<p>To test the online service, you can use the frontend <a href="http://dstrategies-frontend-%USER%-canary.apps.%CLUSTER%/">URL</a></p>
+</div>
+<div class="paragraph">
+<p>Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 1. Frontend Interface</div>
+</div>
+<div class="paragraph">
+<p>Notice that in each microservice response we have added metadata information to see better the <strong>version</strong> of each application. This will help us to see the changes while we do the canary deployment.  We can see that the current version is <strong>V1.0.0</strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="04-canary"><a class="anchor" href="#04-canary"></a>Dstrategies-back canary deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We have split a <strong>Cloud Native</strong> Canary deployment into three automatic steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Deploy canary version for 10%</p>
+</li>
+<li>
+<p>Scale the canary version to 50%</p>
+</li>
+<li>
+<p>Scale the canary version to 100%</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This is just an example. The key point here is that very easily we can have the canary deployment that better fits our needs. To make this demo faster we have not set a pause without duration in any step, so  <strong>Argo Rollouts</strong> will go throw each step automatically.</p>
+</div>
+<div class="paragraph">
+<p>To test canary deployment we are going to do changes in the backend application dstrategies-back.</p>
+</div>
+<div class="sect2">
+<h3 id="04-step1"><a class="anchor" href="#04-step1"></a>Step 1 - Deploy the canary version for 10%</h3>
+<div class="paragraph">
+<p>We will deploy a new version <strong>V2.0.0</strong>. To do it, we have to edit the files <strong>./canary/dstrategies-back-rollout.yaml</strong> and <strong>./canary/dstrategies-back-configmap.yaml</strong> to modify the value <strong>v1.0.0</strong> to <strong>V2.0.0</strong>:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">          image: 'quay.io/dseveria/dstrategies-back:V2.0.0' &lt;---</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">  application.version: V2.0.0 &lt;---</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Before applying these changes, it is important to monitor the current version via the frontend. To track all canary processes, it is required to prepare the frontend to generate multiple requests.</p>
+</div>
+<div class="paragraph">
+<p>To test the online service, you can use the frontend <a href="http://dstrategies-frontend-%USER%-canary.apps.%CLUSTER%/">URL</a></p>
+</div>
+<div class="paragraph">
+<p>Visit the frontend route via your web browser, edit the number of <strong>Calls Retries</strong> to 10000 and push - JUMP- button and ensure the following message is displaying on your screen:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 2. Frontend Interface</div>
+</div>
+<div class="paragraph">
+<p><strong>Argo Rollouts</strong> will automatically deploy a new dstrategies-back revision. The canary version will be 10% of the replicas. In this demo, we are not using <a href="https://argoproj.github.io/argo-rollouts/features/traffic-management/">traffic management</a>. <strong>Argo Rollouts</strong> makes a best-effort attempt to achieve the percentage listed in the last setWeight step between the new and old version. This means that it will create only one replica in the new revision because it is rounded up. All the requests are load balanced between the old and the new replicas.</p>
+</div>
+<div class="paragraph">
+<p>Push the changes to start the deployment.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
+git commit -m "Change dstrategies-back version to V2.0.0"
+git push</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ArgoCD will refresh the status after some minutes. If you don&#8217;t want to wait you can refresh it manually from ArgoCD UI.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-Dstrategies-canary-Refresh.png" alt="Refresh Dstrategies">
+</div>
+</div>
+<div class="paragraph">
+<p>This is our current status:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/canary-rollout-step-1.png" alt="&quot;Dstrategies Step 1">
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE    INFO
+⟳ dstrategies-back                            Rollout     ॥ Paused   3m13s
+├──# revision:2
+│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  8s     canary
+│     └──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  8s     ready:1/1
+└──# revision:1
+   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m13s  stable
+      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  3m13s  ready:1/1
+      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m13s  ready:1/1
+      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m13s  ready:1/1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On the front web page you will have the new version in <strong>25%</strong> of the requests.</p>
+</div>
+<div class="paragraph">
+<p>New revision:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 3. Frontend Interface</div>
+</div>
+<div class="paragraph">
+<p>Old revision:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 4. Frontend Interface</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-step2"><a class="anchor" href="#04-step2"></a>Step 2 - Scale the canary version to 50%</h3>
+<div class="paragraph">
+<p>After 30 seconds <strong>Argo Rollouts</strong> automatically will increase the number of replicas in the new release to 2. Instead of increasing automatically after 30 seconds, we can configure <strong>Argo Rollouts</strong> to wait indefinitely until that <strong>Pause</strong> condition is removed. But this is not part of this demo.</p>
+</div>
+<div class="paragraph">
+<p>This is our current status:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/canary-rollout-step-2.png" alt="Dstrategies Step 2">
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE    INFO
+⟳ dstrategies-back                            Rollout     ॥ Paused   3m47s
+├──# revision:2
+│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  42s    canary
+│     ├──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  42s    ready:1/1
+│     └──□ dstrategies-back-9dc6f576f-8qppq   Pod         ✔ Running  6s     ready:1/1
+└──# revision:1
+   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m47s  stable
+      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m47s  ready:1/1
+      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m47s  ready:1/1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>New revision:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 5. Frontend Interface</div>
+</div>
+<div class="paragraph">
+<p>Old revision:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary-v1.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 6. Frontend Interface</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-step3"><a class="anchor" href="#04-step3"></a>Step 3 - Scale the canary version to 100%</h3>
+<div class="paragraph">
+<p>After another 30 seconds, <strong>Argo Rollouts</strong> will increase the number of replicas in the new release to 4 and scale down the old revision.</p>
+</div>
+<div class="paragraph">
+<p>This is our current status:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/canary-rollout-step-3.png" alt="Dstrategies Step 3">
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">kubectl argo rollouts get rollout dstrategies-back --watch -n %USER%-canary</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                 KIND        STATUS        AGE    INFO
+⟳ dstrategies-back                           Rollout     ✔ Healthy     4m32s
+├──# revision:2
+│  └──⧉ dstrategies-back-9dc6f576f           ReplicaSet  ✔ Healthy     87s    stable
+│     ├──□ dstrategies-back-9dc6f576f-fwq8m  Pod         ✔ Running     87s    ready:1/1
+│     ├──□ dstrategies-back-9dc6f576f-8qppq  Pod         ✔ Running     51s    ready:1/1
+│     ├──□ dstrategies-back-9dc6f576f-5ch92  Pod         ✔ Running     17s    ready:1/1
+│     └──□ dstrategies-back-9dc6f576f-kmvdh  Pod         ✔ Running     17s    ready:1/1
+└──# revision:1
+   └──⧉ dstrategies-back-67fc9fb79b          ReplicaSet  • ScaledDown  4m32s</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>We have in the online environment the new version V2.0.0!!!</strong></p>
+</div>
+<div class="paragraph">
+<p>New revision:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary-v2.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 7. Frontend Interface</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="04-rollback"><a class="anchor" href="#04-rollback"></a>Rollback</h3>
+<div class="paragraph">
+<p>Imagine that something goes wrong, we know that this never happens but just in case. We can do a very <strong>quick rollback</strong> just by undoing the change.</p>
+</div>
+<div class="paragraph">
+<p><strong>Argo Rollouts</strong> has an <a href="https://argoproj.github.io/argo-rollouts/generated/kubectl-argo-rollouts/kubectl-argo-rollouts_undo/">undo</a> command to do the rollback. In our opinion, we don&#8217;t like this procedure because it is not aligned with GitOps. The changes that <strong>Argo Rollouts</strong> do does not come from git, so git is OutOfSync with what we have in Openshift.
+In our case the commit that we have done not only changes the ReplicaSet but also the ConfigMap. The <strong>undo</strong> command only changes the ReplicaSet, so it does not work for us.</p>
+</div>
+<div class="paragraph">
+<p>We recommend making changes in git rather than in Argo Rollouts. Therefore, we will revert the last commit:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git revert HEAD --no-edit</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If we just revert the changes in git we will go back to the previous version. But <strong>Argo Rollouts</strong> will take this revert as a new release so it will do it throw the steps that we have configured. We want a <strong>quick rollback</strong> we don&#8217;t want a step-by-step revert. To achieve the <strong>quick rollback</strong> we will configure <strong>Argo Rollouts</strong> without steps for the rollback.</p>
+</div>
+<div class="paragraph">
+<p>In the file <strong>./canary/dstrategies-back-rollout.yaml</strong>  under <strong>dstrategies-back</strong> under the <strong>steps</strong>, delete all the steps and only set one step <strong>- setWeight: 100</strong>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  strategy:
+    canary:
+      analysis:
+        startingStep: 1
+        templates:
+        - templateName: dstrategies-back-analysis-template
+      steps:
+      - setWeight: 100</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Execute those commands to push the changes:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
+git commit -m "delete steps for rollback"
+git push</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>ArgoCD</strong> will get the changes and apply them. <strong>Argo Rollouts</strong> will create a new revision with the previous version.</p>
+</div>
+<div class="paragraph">
+<p>The rollback is done!</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/canary-rollout-step-Rollback.png" alt="Dstrategies Step Rollback">
+</div>
+</div>
+<div class="paragraph">
+<p>To test the online service, you can use the frontend <a href="http://dstrategies-frontend-%USER%-canary.apps.%CLUSTER%/">URL</a></p>
+</div>
+<div class="paragraph">
+<p>Visit the frontend route via your web browser, push - JUMP- button and ensure the following message is displaying on your screen:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/frontend-canary.png" alt="Frontend Interface">
+</div>
+<div class="title">Figure 8. Frontend Interface</div>
+</div>
+<div class="paragraph">
+<p>To get the application ready for a new release we should configure again the  <strong>Argo Rollouts</strong> with the steps.</p>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="03-blue-green-deployment.html" class="query-params-link">3. Blue/Green deployment strategy</a></span>
+  <span class="next"><a href="05-canary-deployment-service-mesh.html" class="query-params-link">5. Canary deployment strategy with Service Mesh</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

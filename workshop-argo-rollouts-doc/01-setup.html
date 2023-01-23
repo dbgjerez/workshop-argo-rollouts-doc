@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Environment Setup :: RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts</title>
+    <link rel="canonical" href="https://github.com/dbgjerez/workshop-argo-rollouts-doc/workshop-argo-rollouts-doc/01-setup.html">
+    <link rel="prev" href="index.html">
+    <link rel="next" href="02-deployment-strategies.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="../_/img/header_logo.png" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://github.com/dbgjerez/workshop-argo-rollouts-doc">RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="workshop-argo-rollouts-doc" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">Workshop</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html">1. Environment Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#01-prerequisites">1.1 Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="#01-laboratory">1.2 Laboratory</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#01-parameters">1.2.1 Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#01-accessconsole">1.2.2 Access - OCP Console</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#01-accesscli">1.2.3 Access - OCP CLI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#01-accessArgoCD">1.2.4 Access - ArgoCD dashboard</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="#01-cloneGit">1.2.5 Clone the GitOps repository</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#01-clusterSetup">1.3 Cluster Setup</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html">2. Deployment Strategies with Argo CD and Argo Rollouts</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deployment-strategies.html#02-dstrategies-app">2.1 DStrategies App</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html#02-deployment-strategies">2.2 Deployment Strategies</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-micro-arch">2.2.1 Microservices Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-cd">2.2.2 Continuous Delivery</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-pd">2.2.3 Progressive Delivery</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html#02-argo-rollouts">2.2.4 Argo Rollouts</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="02-deployment-strategies.html#02-bg">2.2.4.1 Blue/Green Deployment</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="02-deployment-strategies.html#02-canary">2.2.4.2 Canary Deployment</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html">3. Blue/Green deployment strategy</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-arch">3.1 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html#03-dmodel">3.2 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-reviewsvc">3.2.1 Review Services</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-rollout">3.2.2 Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-anatemp">3.2.3 Modify Analysis Template</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-backurl">3.2.4 Modify back service URL</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-commit">3.2.5 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-argo">3.3 Argo CD Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-test">3.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html#03-deploy">3.5 DStrategies-back Blue/Green deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-step1">3.5.1 Step 1 - Deploy a new version</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-step2">3.5.2 Step 2 - Promote a new version</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-rollback">3.5.3 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-canary-deployment.html">4. Canary deployment strategy</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-canary-deployment.html#04-arch">4.1 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-review">4.1.1 Review and Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-mod">4.1.2 Modify Analysis Template</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-url">4.1.3 Modify back service URL</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-git">4.1.4 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-canary-deployment.html#04-delpoy">4.2 Deploy Dstrategies Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-canary-deployment.html#04-app">4.3 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-canary-deployment.html#04-test">4.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-canary-deployment.html#04-canary">4.5 Dstrategies-back canary deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-step1">4.5.1 Step 1 - Deploy the canary version for 10%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-step2">4.5.2 Step 2 - Scale the canary version to 50%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-step3">4.5.3 Step 3 - Scale the canary version to 100%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-rollback">4.5.4 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html">5. Canary deployment strategy with Service Mesh</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-arch">5.1 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-review">5.1.1 Review and Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-helm">5.1.2 Modify Helm values</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-prometheus">5.1.3 Obtain Red Hat Service Mesh Prometheus Password</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-git">5.1.4 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-deploy">5.2 Deploy Dstrategies Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-app">5.3 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-test">5.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-canary">5.5 Dstrategies-back canary deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-rollback">5.5.1 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Workshop</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Workshop</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Workshop</a></li>
+    <li><a href="01-setup.html">1. Environment Setup</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/dbgjerez/workshop-argo-rollouts-doc/edit/master/documentation/modules/ROOT/pages/01-setup.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Environment Setup</h1>
+<div class="sect1">
+<h2 id="01-prerequisites"><a class="anchor" href="#01-prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>During this tutorial, it will be required to work with different tools for running the exercises included. Please install the following software:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top"><strong>Tool</strong></th>
+<th class="tableblock halign-center valign-top"><strong>Fedora</strong></th>
+<th class="tableblock halign-center valign-top"><strong>macOS</strong></th>
+<th class="tableblock halign-center valign-top"><strong>Windows</strong></th>
+<th class="tableblock halign-center valign-top"><strong>Official Documentation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">oc</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-mac.tar.gz">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-windows.zip">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html">OpenShift CLI - Docs</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">git</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/linux">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/mac">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/win">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com">Git - Docs</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Argo Rollouts CLI</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-rollouts/releases/download/v1.3.1/kubectl-argo-rollouts-linux-amd64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-rollouts/releases/download/v1.3.1/kubectl-argo-rollouts-linux-arm64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-rollouts/releases/download/v1.3.1/kubectl-argo-rollouts-windows-amd64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://argoproj.github.io/argo-rollouts/installation/#kubectl-plugin-installation">Git - Docs</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Visual Studio Code</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://code.visualstudio.com/sha/download?build=stable&amp;os=linux-rpm-x64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://code.visualstudio.com/sha/download?build=stable&amp;os=darwin">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://code.visualstudio.com/sha/download?build=stable&amp;os=win32-user">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://code.visualstudio.com/">Visual Studio Code - Docs</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Please review the official documentation to install the latest versions of these tools on your laptop following the optimum procedure
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>It is also required to have a <a href="https://github.com">GitHub</a> account in order to create some repositories during this tutorial.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="01-laboratory"><a class="anchor" href="#01-laboratory"></a>Laboratory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The technical exercises included in this tutorial are based on cloud native solutions which are extensively used in the IT market. Please review the following list which includes the basics around these cloud native solutions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/">GitHub</a> is a provider of Internet hosting for software development and version control using Git. It offers the distributed version control and source code management functionality of Git, plus its own features.</p>
+</li>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/">Red Hat Openshift Container Platform Cluster</a> is an enterprise-ready Kubernetes container platform with full-stack automated operations to manage hybrid cloud, multicloud, and edge deployments. Red Hat OpenShift is optimized to improve developer productivity and promote innovation.</p>
+</li>
+<li>
+<p><a href="https://argoproj.github.io/argo-cd/">ArgoCD</a> is a declarative, GitOps continuous delivery tool for Kubernetes following the GitOps pattern of using Git repositories as the source of truth for defining the desired application state. Argo CD automates the deployment of the desired application states in the specified target environments. Application deployments can track updates to branches, tags, or pinned to a specific version of manifests at a Git commit.</p>
+</li>
+<li>
+<p><a href="https://argoproj.github.io/argo-rollouts/">Argo Rollouts</a> provides advanced deployment capabilities such as blue-green, canary, canary analysis, experimentation, and progressive delivery features to Kubernetes.</p>
+</li>
+<li>
+<p><a href="https://helm.sh/">Helm</a> is a tool to find, share, and use software built for Kubernetes. Helm helps users manage Kubernetes applications in terms of definition, installing, and upgrading even the most complex Kubernetes applications.</p>
+</li>
+<li>
+<p><a href="https://quarkus.io/">Quarkus</a> is a Kubernetes-native Java framework tailored for GraalVM and HotSpot, crafted from best-of-breed Java libraries and standards. The goal is to make Java the leading platform in Kubernetes and serverless environments while offering developers a framework to address a wider range of distributed application architectures.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>During this tutorial, a set of resources are provided by the instructor in order to be able to complete the exercises described in the following sections. The main objective of these resources is to provide a platform, multiple templates and other resources which are required to create different objects in Openshift.</p>
+</div>
+<div class="paragraph">
+<p>Please review the following list to have an overall understanding of the resources provided for completing this tutorial:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An Openshift cluster that will host and make available a set of applications</p>
+</li>
+<li>
+<p>A set of dedicated namespaces per user in the Openshift Cluster</p>
+</li>
+<li>
+<p>An ArgoCD installation that allows attendees to deploy applications in a GitOps fashion</p>
+</li>
+<li>
+<p>An Argo Rollouts installation that allows attendees to deploy applications using deployment strategies such as Blue/Green and Canary</p>
+</li>
+<li>
+<p>A set of GitHub repositories that include the templates and automatisms required to deploy a group of applications</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="01-parameters"><a class="anchor" href="#01-parameters"></a>Parameters</h3>
+<div class="paragraph">
+<p>The instructor provides the users with the necessary Openshift credentials and other important parameters at the beginning of this tutorial to access and complete the laboratory.</p>
+</div>
+<div class="paragraph">
+<p>The following table includes the parameters that the instructor should provide you at the beginning of the laboratory:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top"><strong>Name</strong></th>
+<th class="tableblock halign-center valign-top"><strong>Value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Openshift Cluster API (Access CLI)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><em><a href="https://api.%CLUSTER%:6443" class="bare">https://api.%CLUSTER%:6443</a></em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Openshift Cluster Console</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><em><a href="https://console-openshift-console.apps.%CLUSTER%" class="bare">https://console-openshift-console.apps.%CLUSTER%</a></em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Openshift Domain</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">%CLUSTER%</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Username</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">%USER%</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Password</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">%USER%</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">App Namespace GitOps</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">%USER%-gitops-argocd</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">App Namespace for Blue-Green deployment</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">%USER%-blue-green</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">App Namespace for Canary deployment</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">%USER%-canary</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">App Namespace for Canary deployment with Service Mesh</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">%USER%-canary-service-mesh</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">ArgoCD console</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><em><a href="https://argocd-server-%USER%-gitops-argocd.apps.%CLUSTER%/" class="bare">https://argocd-server-%USER%-gitops-argocd.apps.%CLUSTER%/</a></em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Service Mesh Prometheus Password</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><em>*Review parameters table provided by the instructor</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="01-accessconsole"><a class="anchor" href="#01-accessconsole"></a>Access - OCP Console</h3>
+<div class="paragraph">
+<p>In order to check the laboratory environment, please access the Openshift Console via browser using your credentials:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em><a href="https://console-openshift-console.apps.%CLUSTER%" class="bare">https://console-openshift-console.apps.%CLUSTER%</a></em></p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp_console.png" alt="ocp console">
+</div>
+<div class="title">Figure 1. Openshift Console</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Use <strong>lab-users</strong> section to log in with your credentials.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="01-accesscli"><a class="anchor" href="#01-accesscli"></a>Access - OC Client</h3>
+<div class="paragraph">
+<p>The OpenShift Container Platform CLI (which needs to be installed first) exposes the commands for managing your applications as well as the lower-level tools to interact with each component of your system. With the <strong>oc</strong> command, you can create applications and manage OpenShift Container Platform projects from a terminal.</p>
+</div>
+<div class="paragraph">
+<p>Please check that you have followed the pre-requisites with your instructor and connect to the cluster executing the next command from your terminal:</p>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc login -u %USER% -p %USER% https://api.%CLUSTER%:6443</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the login is successful, it should show an output similar to the following screenshot:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/oc_login_output.png" alt="OC CLI Login Output">
+</div>
+<div class="title">Figure 2. OC CLI Login Output</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Please pay special attention to <strong>oc CLI</strong> because you will need to use this tool several times during this tutorial.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>As shown in the output, the user will have access to the following namespaces:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>%USER%-gitops-argocd</strong>: It contains Argo CD installation and all the GitOps objects.</p>
+</li>
+<li>
+<p><strong>%USER%-blue-green</strong>: It will contain the application using Blue/Green deployment.</p>
+</li>
+<li>
+<p><strong>%USER%-canary</strong>: It will contain the application using Canary deployment.</p>
+</li>
+<li>
+<p><strong>%USER%-canary-service-mesh</strong>: It will contain the application using Canary deployment with Service Mesh.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each user will have its own four namespaces.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="01-accessArgoCD"><a class="anchor" href="#01-accessArgoCD"></a>Access - Argo CD dashboard</h3>
+<div class="paragraph">
+<p>The Argo CD web console will give you access to control how the git repo is synced with Openshift, as well as check the real status of the synchronization. To log in to the web console, access to <em><a href="https://argocd-server-%USER%-gitops-argocd.apps.%CLUSTER%/" class="bare">https://argocd-server-%USER%-gitops-argocd.apps.%CLUSTER%/</a></em></p>
+</div>
+<div class="paragraph">
+<p>It is important to bear in mind that Argo CD upon installation generates an initial admin password which is stored in a Kubernetes secret. In order to retrieve this password, run the following command to decrypt the admin password:</p>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc extract secret/argocd-cluster -n %USER%-gitops-argocd --to=-</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Log into Argo CD with <code>admin</code> username and the password retrieved from the previous step.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd_login.png" alt="ArgoCD login screen">
+</div>
+<div class="title">Figure 3. ArgoCD login screen</div>
+</div>
+<div class="paragraph">
+<p>If the login is successful, you will see the home screen where your applications will be created.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd_applications.png" alt="ArgoCD applications">
+</div>
+<div class="title">Figure 4. ArgoCD applications</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="01-argocdkubectlplugin"><a class="anchor" href="#01-argocdkubectlplugin"></a>Argo Rollouts Kubectl plugin</h3>
+<div class="paragraph">
+<p>Argo Rollouts offers a Kubectl plugin to enrich the experience with Rollouts, Experiments, and Analysis from the command line. It offers the ability to visualize the Argo Rollouts resources and run routine operations like promoting or retrying on those resources from the command.</p>
+</div>
+<div class="paragraph">
+<p>Install it using the <a href="https://argoproj.github.io/argo-rollouts/installation/#kubectl-plugin-installation">official documentation</a>. Then, check that the plugin is correctly installed using the following command:</p>
+</div>
+<div class="listingblock lines_space console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc argo rollouts list rollouts
+No resources found.</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+If the previous command shows something like <code>Error: unknown command "argo" for "oc"</code>, please recheck your installation.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="01-cloneGit"><a class="anchor" href="#01-cloneGit"></a>Clone the GitOps repository</h3>
+<div class="paragraph">
+<p>Following the GitOps practices, all the deployment configuration is stored in the git repo. We have created an initial repository that you will change to configure your deployment. As part of the demo, you will have to do some changes and commits.</p>
+</div>
+<div class="paragraph">
+<p>Please fork the repository and clone it in your local machine to have full autonomy to make changes and deploy applications. In order to complete this task, follow the next steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Access the <a href="https://github.com/rhte2023-argo-rollouts/dstrategies-app-deployment">DStrategy App Deployment</a> repository.</p>
+</li>
+<li>
+<p>Fork it on your GitHub account. If prompted, choose to fork only the <code>main</code> branch.</p>
+</li>
+<li>
+<p>Clone the repository to your local machine. You can use both SSH and HTTPS URLs. If you have already configured your SSH keys, use this mechanism. If not, use HTTPS.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git clone <a href="https://github.com/change_me/dstrategies-app-deployment" class="bare">https://github.com/change_me/dstrategies-app-deployment</a>
+cd dstrategies-app-deployment</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_configure_your_github_token"><a class="anchor" href="#_configure_your_github_token"></a>Configure your GitHub token</h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Why do I need this?</div>
+<div class="paragraph">
+<p>GitHub does not allow user-pass authentication anymore. Therefore, if you cloned the repo using the HTTPS link, you will need to generate a GH Token.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Currently, there are two types of GitHub Personal Access Tokens (PATs): Fine-grained tokens and Classic tokens. <strong>Fine-grained personal access tokens</strong> give developers granular control over the permissions and repository access they grant to a PAT and are the new alternative to the traditional Classic tokens. That is why we will use Fine-grained tokens.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Access the <a href="https://github.com/settings/tokens?type=beta"><code>New fine-grained personal access token</code> page for your GitHub account</a>.</p>
+</li>
+<li>
+<p>Click on <code>Generate new token</code>.</p>
+</li>
+<li>
+<p>Enter the following values:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Token name: <code>dstrategies-app-deployment</code>.</p>
+</li>
+<li>
+<p>Expiration: <code>7 days</code>.</p>
+</li>
+<li>
+<p>Description: <code>Token to manage my dstrategies-app-deployment repository from automation pipelines</code>.</p>
+</li>
+<li>
+<p>Resource owner: Yourself.</p>
+</li>
+<li>
+<p>Repository access: Select <code>Only selected repositories</code> and choose the repository that you just cloned.</p>
+<div class="imageblock">
+<div class="content">
+<img src="_images/github-token-01.png" alt="Step 1 to create a GitHub token">
+</div>
+<div class="title">Figure 5. Step 1 to create a GitHub token</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Now choose the following permissions for this token:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Contents: Access: Read and Write</code>: To allow pushing commits to the repository.</p>
+</li>
+<li>
+<p><code>Pull requests: Access: Read and Write</code>: To allow automating pull-requests creation.</p>
+<div class="imageblock">
+<div class="content">
+<img src="_images/github-token-02.png" alt="Step 2 to create a GitHub token">
+</div>
+<div class="title">Figure 6. Step 2 to create a GitHub token</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Click on <code>Generate Token</code>.</p>
+</li>
+<li>
+<p>Copy the token content, as you will not be able to see it again. You will need it later <strong>on several occasions</strong>.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="01-clusterSetup"><a class="anchor" href="#01-clusterSetup"></a>Cluster Setup</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The cluster is already set up, so you do not need to follow the steps in this section. However, save the following link if you want to recreate this workshop in your own Openshift cluster.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Please visit <a href="https://github.com/rhte2023-argo-rollouts/ocp-cluster-setup.git">Openshift Cluster Setup</a> for more information about setting up an Openshift cluster in order to run this workshop.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="index.html" class="query-params-link">Workshop</a></span>
+  <span class="next"><a href="02-deployment-strategies.html" class="query-params-link">2. Deployment Strategies with Argo CD and Argo Rollouts</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
