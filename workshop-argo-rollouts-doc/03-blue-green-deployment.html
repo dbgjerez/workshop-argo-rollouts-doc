@@ -677,52 +677,55 @@ NAME                                                 KIND         STATUS        
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/rollout-blue-green-step-1.png" alt="&quot;Dstrategies Step 1">
+<img src="_images/rollout-blue-green-step-1.png" alt="&quot;film-storage blue/green Step 1">
 </div>
 </div>
 <div class="paragraph">
-<p>To test the online service, you can use the frontend <a href="http://dstrategies-frontend-%USER%-blue-green.apps.%CLUSTER%/">URL</a></p>
-</div>
-<div class="paragraph">
-<p>Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-blue-green.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 1. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>We can see that nothing has changed for the users.</p>
-</div>
-<div class="paragraph">
-<p>In addition, regarding testing the offline service, it is required to get the Offline route and check the version is <strong>V2.0.0</strong> and the colour is <strong>Blue</strong>:</p>
+<p>You can check the deployment with the following requests:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl "$(oc get routes dstrategies-back-offline -n %USER%-blue-green --template='http://{{.spec.host}}')/dstrategies-back"</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl "$(oc get routes film-storage-online -n %USER%-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp</code></pre>
 </div>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">{"metadata":{"version":"V2.0.0","colour":"Blue"}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">{
+   "app" : {
+      "buildTime" : "2023/01/10 15:17:57",
+      "name" : "film-storage",
+      "version" : "0.2"
+   }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl "$(oc get routes film-storage-offline -n %USER%-blue-green --template='http://{{.spec.host}}')/api/v1/info" | json_pp</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">{
+   "app" : {
+      "buildTime" : "2023/01/23 21:43:23",
+      "name" : "film-storage",
+      "version" : "0.3"
+   }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Functional testing users can execute <strong>Smoke tests</strong> to validate this new V2.0.0 version.</p>
-</div>
-<div class="paragraph">
-<p>We have to be careful with those tests in a production environment because the product microservice will call the online dependencies.
-If this dependency is for example a production DB we will modify the Production environment.</p>
+<p>Functional testers can execute tests to validate this new 0.3 version.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="03-step2"><a class="anchor" href="#03-step2"></a>Step 2 - Promote a new version</h3>
 <div class="paragraph">
-<p>We are going to open the new version to final users.</p>
+<p>As we have the promotion turned on to manual, we&#8217;re going to promote the new version to final users.</p>
 </div>
 <div class="paragraph">
-<p>Argo Rollouts provides this command to promote dstrategies-back:</p>
+<p>Argo Rollouts provides this command to promote film-storage:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -788,7 +791,7 @@ NAME                                  KIND         STATUS        AGE  INFO
 <div class="content">
 <img src="_images/frontend-blue-green-v2.png" alt="Frontend Interface V2.0.0">
 </div>
-<div class="title">Figure 2. Frontend Interface</div>
+<div class="title">Figure 1. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p><strong>We have in the online environment the new version V2.0.0!!!</strong></p>
@@ -858,7 +861,7 @@ NAME                                          KIND         STATUS        AGE   I
 <div class="content">
 <img src="_images/frontend-blue-green-v1.png" alt="Frontend Interface V1.0.0">
 </div>
-<div class="title">Figure 3. Frontend Interface</div>
+<div class="title">Figure 2. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p>The rollback is done!</p>
