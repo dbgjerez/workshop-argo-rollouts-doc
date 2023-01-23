@@ -21,7 +21,7 @@ Specifically, this microservice exposes a few endpoints such as its own informat
 | List of movies
 |===
 
-During this workshop, you will be able to deploy this application using different deployment strategies in order to gain knowledge and skills in managing microservice releases. 
+During this workshop, you will be able to deploy this application using different deployment strategies, in order to gain knowledge and skills in managing microservice releases. 
 
 [#02-deployment-strategies]
 == Deployment Strategies Overview
