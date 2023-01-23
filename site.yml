@@ -4,7 +4,7 @@ runtime:
 site:
   title: "RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts"
   url: https://github.com/dbgjerez/workshop-argo-rollouts-doc
-  start_page: redhat-workshop-deployment-strategies::index.adoc
+  start_page: workshop-argo-rollouts-doc::index.adoc
 
 
 content:
