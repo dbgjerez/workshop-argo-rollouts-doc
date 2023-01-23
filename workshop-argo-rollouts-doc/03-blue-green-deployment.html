@@ -324,11 +324,8 @@
 <article class="doc">
 <h1 class="page">Blue/Green deployment strategy</h1>
 <div class="sect1">
-<h2 id="03-arch"><a class="anchor" href="#03-arch"></a>Application architecture</h2>
+<h2 id="03-arch"><a class="anchor" href="#03-arch"></a>film-storage architecture</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>As mentioned before, we have a very simple application with two services. One frontal React app called <strong>dstrategies-front</strong> and one backend Quarkus app called <strong>dstrategies-back</strong>. We will use the front app to call several times the back app and see how the back version changes during the deployment.</p>
-</div>
 <div class="paragraph">
 <p>To achieve Blue/Green deployment with <strong>Cloud Native</strong> applications using <strong>Argo Rollouts</strong>, we have designed this architecture.</p>
 </div>
@@ -337,7 +334,7 @@
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/rollout-blue-green-step-0.png" alt="DStrategies initial status">
+<img src="_images/rollout-blue-green-step-0.png" alt="Initial status">
 </div>
 </div>
 <div class="paragraph">
@@ -373,12 +370,12 @@
 </ul>
 </div>
 <div class="paragraph">
-<p>We will define an active or online service 'dstrategies-back-online' and a preview or offline service 'dstrategies-back-offline'. The idea is that the frontend will always use 'dstrategies-back-online' and 'dstrategies-back-offline' will only be used to test our service before triggering the rollout.</p>
+<p>We will define an active or online service 'film-storage-online' and a preview or offline service 'film-storage-offline'. The idea is that the frontend will always use 'film-storage-online' and 'film-storage-offline' will only be used to test our service before triggering the rollout.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="03-dmodel"><a class="anchor" href="#03-dmodel"></a>Generate DStrategies APP GitOps Deployment Model</h2>
+<h2 id="03-dmodel"><a class="anchor" href="#03-dmodel"></a>Generate film-storage APP GitOps Deployment Model</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>First of all, it is required to review a set of objects in our forked git repository to configure the deployment correctly for deploying our application following a GitOps model.</p>
@@ -389,10 +386,10 @@
 <div class="sect2">
 <h3 id="03-reviewsvc"><a class="anchor" href="#03-reviewsvc"></a>Review Services</h3>
 <div class="paragraph">
-<p>As the previous picture shows, it is required to generate a couple of services that will be used to redirect the traffic to the correct DStrategies App version.</p>
+<p>As the previous picture shows, it is required to generate a couple of services that will be used to redirect the traffic to the correct application version.</p>
 </div>
 <div class="paragraph">
-<p>Please take a look at the files <strong>./blue-green/dstrategies-back-service-online.yaml</strong> and <strong>./blue-green/dstrategies-back-service-offline.yaml</strong> to understand the objects and get the names of these elements.</p>
+<p>Please take a look at the files <strong>./blue-green/film-storage-service-offline.yaml</strong> and <strong>./blue-green/film-storage-service-online.yaml</strong> to understand the objects and get the names of these elements.</p>
 </div>
 </div>
 <div class="sect2">
@@ -401,7 +398,7 @@
 <p>The Rollout object controls the application deployment. If you look closely, it is possible to find many similarities between an Argo Rollout object and a Kubernetes Deployment. The main difference between the previous objects referenced is the rollout strategy field.</p>
 </div>
 <div class="paragraph">
-<p>Please edit the file named <strong>./blue-green/dstrategies-back-rollout.yaml</strong> in order to add the required <strong>&lt;SERVICE_OFFLINE&gt;</strong> and <strong>&lt;SERVICE_ONLINE&gt;</strong> service names:</p>
+<p>Please edit the file named <strong>./blue-green/film-storage-back-rollout.yaml</strong> in order to add the required <strong>&lt;SERVICE_OFFLINE&gt;</strong> and <strong>&lt;SERVICE_ONLINE&gt;</strong> service names:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -409,9 +406,6 @@
     blueGreen:
       activeService: &lt;SERVICE_ONLINE&gt;
       autoPromotionEnabled: false
-      prePromotionAnalysis:
-        templates:
-          - templateName: dstrategies-back-analysis-template
       previewService: &lt;SERVICE_OFFLINE&gt;</code></pre>
 </div>
 </div>
@@ -419,20 +413,27 @@
 <div class="sect2">
 <h3 id="03-anatemp"><a class="anchor" href="#03-anatemp"></a>Modify Analysis Template</h3>
 <div class="paragraph">
-<p>We have created an AnalysisTemplate 'dstrategies-back-analysis-template' that just validates the health of the application, for production environments a better analysis should be done. <strong>Argo Rollouts</strong> uses this AnalysisTemplate to validate a new version and set whether it is ready to be promoted or not.</p>
+<p>We have created an AnalysisTemplate 'film-storage-analysis-template' that just validates the health of the application, for production environments a better analysis should be done. <strong>Argo Rollouts</strong> uses this AnalysisTemplate to validate a new version and set whether it is ready to be promoted or not.</p>
 </div>
 <div class="paragraph">
-<p>Please edit the file named <strong>./blue-green/dstrategies-back-analysis-template.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> that helps to reference the user namespace in the healthcheck URL.</p>
+<p>Please edit the file named <strong>./blue-green/film-storage-analysis-template.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> that helps to reference the user namespace in the healthcheck URL.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  metrics:
-    - name: dstrategies-back-webmetric
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  labels:
+    app: film-storage
+  name: film-storage-analysis-template
+spec:
+  metrics:
+    - name: film-storage-webmetric
       provider:
         web:
           jsonPath: '{$.status}'
           url: &gt;-
-            <a href="http://dstrategies-back-offline.&lt;USERNAME&gt;-blue-green.svc.cluster.local:8080/q/health/ready" class="bare">http://dstrategies-back-offline.&lt;USERNAME&gt;-blue-green.svc.cluster.local:8080/q/health/ready</a>
+            <a href="http://film-storage-offline.&lt;USERNAME&gt;-blue-green.svc.cluster.local:8080/api/v1/health" class="bare">http://film-storage-offline.&lt;USERNAME&gt;-blue-green.svc.cluster.local:8080/api/v1/health</a>
       successCondition: result == 'UP'</code></pre>
 </div>
 </div>
@@ -450,24 +451,6 @@ For more information about AnalysisTemplate, please visit the following <a href=
 </div>
 </div>
 <div class="sect2">
-<h3 id="03-backurl"><a class="anchor" href="#03-backurl"></a>Modify back service URL</h3>
-<div class="paragraph">
-<p>Finally, it is required to create a <strong>Deployment</strong> object to deploy the frontend application. This application helps us to test the blue-green rollout strategy from a web interface and see backend information.</p>
-</div>
-<div class="paragraph">
-<p>To allow communication between the frontend and the backend, it is required to edit the file named <strong>./blue-green/dstrategies-frontend-deployment.yaml</strong> to add the required <strong>&lt;USERNAME&gt;</strong> and <strong>&lt;OCP_DOMAIN&gt;</strong>. You can check their values in the <a href="01-setup.html#01-parameters" class="xref page">parameters chapter</a>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">        env:
-          - name: REACT_APP_BACK
-            value: <a href="http://dstrategies-back-online-&lt;USERNAME&gt;-blue-green.apps.&lt;OCP_DOMAIN&gt;/dstrategies-back" class="bare">http://dstrategies-back-online-&lt;USERNAME&gt;-blue-green.apps.&lt;OCP_DOMAIN&gt;/dstrategies-back</a>
-          - name: REACT_APP_CATEGORY
-            value: BLUE-GREEN</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="03-commit"><a class="anchor" href="#03-commit"></a>Commit and Push the Changes</h3>
 <div class="paragraph">
 <p>Once all the files are configured correctly, it is time to commit and push all changes to the repository that you have just forked.</p>
@@ -475,7 +458,7 @@ For more information about AnalysisTemplate, please visit the following <a href=
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "Configured DStrategies App deployment files"
+git commit -m "Configured film-storage blue/green deployment files"
 git push</code></pre>
 </div>
 </div>
