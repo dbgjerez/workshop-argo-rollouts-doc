@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Welcome to Red Hat Workshop - Deployment Strategies with Argo CD and Argo Rollouts :: RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts</title>
+    <link rel="canonical" href="https://github.com/dbgjerez/workshop-argo-rollouts-doc/redhat-workshop-deployment-strategies/index.html">
+    <link rel="next" href="01-setup.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="../_/img/header_logo.png" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://github.com/dbgjerez/workshop-argo-rollouts-doc">RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="redhat-workshop-deployment-strategies" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">Workshop</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html">1. Environment Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#01-prerequisites">1.1 Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html#01-laboratory">1.2 Laboratory</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-parameters">1.2.1 Parameters</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-accessconsole">1.2.2 Access - OCP Console</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-accesscli">1.2.3 Access - OCP CLI</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-accessArgoCD">1.2.4 Access - ArgoCD dashboard</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="01-setup.html#01-cloneGit">1.2.5 Clone the GitOps repository</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#01-clusterSetup">1.3 Cluster Setup</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html">2. Deployment Strategies with Argo CD and Argo Rollouts</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-deployment-strategies.html#02-dstrategies-app">2.1 DStrategies App</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html#02-deployment-strategies">2.2 Deployment Strategies</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-micro-arch">2.2.1 Microservices Architecture</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-cd">2.2.2 Continuous Delivery</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="02-deployment-strategies.html#02-pd">2.2.3 Progressive Delivery</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-deployment-strategies.html#02-argo-rollouts">2.2.4 Argo Rollouts</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="02-deployment-strategies.html#02-bg">2.2.4.1 Blue/Green Deployment</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="02-deployment-strategies.html#02-canary">2.2.4.2 Canary Deployment</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html">3. Blue/Green deployment strategy</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-arch">3.1 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html#03-dmodel">3.2 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-reviewsvc">3.2.1 Review Services</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-rollout">3.2.2 Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-anatemp">3.2.3 Modify Analysis Template</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-backurl">3.2.4 Modify back service URL</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-commit">3.2.5 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-argo">3.3 Argo CD Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-test">3.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-blue-green-deployment.html#03-deploy">3.5 DStrategies-back Blue/Green deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-step1">3.5.1 Step 1 - Deploy a new version</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-step2">3.5.2 Step 2 - Promote a new version</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="03-blue-green-deployment.html#03-rollback">3.5.3 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-canary-deployment.html">4. Canary deployment strategy</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-canary-deployment.html#04-arch">4.1 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-review">4.1.1 Review and Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-mod">4.1.2 Modify Analysis Template</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-url">4.1.3 Modify back service URL</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-git">4.1.4 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-canary-deployment.html#04-delpoy">4.2 Deploy Dstrategies Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-canary-deployment.html#04-app">4.3 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-canary-deployment.html#04-test">4.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-canary-deployment.html#04-canary">4.5 Dstrategies-back canary deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-step1">4.5.1 Step 1 - Deploy the canary version for 10%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-step2">4.5.2 Step 2 - Scale the canary version to 50%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-step3">4.5.3 Step 3 - Scale the canary version to 100%</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="04-canary-deployment.html#04-rollback">4.5.4 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html">5. Canary deployment strategy with Service Mesh</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-arch">5.1 Generate DStrategies APP GitOps Deployment Model</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-review">5.1.1 Review and Modify Rollout strategy</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-helm">5.1.2 Modify Helm values</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-prometheus">5.1.3 Obtain Red Hat Service Mesh Prometheus Password</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-git">5.1.4 Commit and Push the Changes</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-deploy">5.2 Deploy Dstrategies Application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-app">5.3 Application architecture</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-test">5.4 Test Dstrategies application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-canary">5.5 Dstrategies-back canary deployment</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="05-canary-deployment-service-mesh.html#05-rollback">5.5.1 Rollback</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Workshop</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Workshop</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Workshop</a></li>
+    <li><a href="index.html">Welcome to Red Hat Workshop - Deployment Strategies with Argo CD and Argo Rollouts</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/dbgjerez/workshop-argo-rollouts-doc/edit/master/documentation/modules/ROOT/pages/index.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Welcome to Red Hat Workshop - Deployment Strategies with Argo CD and Argo Rollouts</h1>
+<div class="sect1 text-center strong">
+<h2>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>Red Hat Workshop - Deployment Strategies with Argo CD and Argo Rollouts</em> is a repository that includes a tutorial with a set of practices for the purpose of practicing with Kubernetes Native GitOps model, <strong>Blue/Green</strong> deployment and <strong>Canary</strong> deployment using <strong>Argo Rollouts</strong></p>
+</div>
+<div class="paragraph">
+<p>The general idea behind this workshop is to get an initial understanding of the following points:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Deploy microservice-based applications in Kubernetes using ArgoCD and Helm.</p>
+</li>
+<li>
+<p>Operate applications in Kubernetes using ArgoCD in a GitOps model.</p>
+</li>
+<li>
+<p>Blue/Green deployment for Cloud Native applications using Argo Rollouts.</p>
+</li>
+<li>
+<p>Canary deployment for Cloud Native applications using Argo Rollouts.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1 text-center strong">
+<h2>Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First of all, it is required to review your local machine prerequisites and laboratory environment access to be able to start working on this tutorial.</p>
+</div>
+<div class="paragraph">
+<p>Please follow <a href="01-setup.html" class="xref page">Environment Setup</a> for more information.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="next"><a href="01-setup.html" class="query-params-link">1. Environment Setup</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
