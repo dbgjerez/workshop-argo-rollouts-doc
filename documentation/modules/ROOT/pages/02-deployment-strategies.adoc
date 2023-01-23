@@ -3,8 +3,8 @@ include::_attributes.adoc[]
 
 The following sections provide an overall vision of the application that will be used during this laboratory and the respective deployment strategies that will be reviewed during the workshop.
 
-[#02-dstrategies-app]
-== DStrategies App
+[#02-deployment-app]
+== Application
 
 DStrategies App is a microservice-based application that is composed of a backend microservice based on https://quarkus.io/[Quarkus] and a frontend microservice based on https://reactjs.org/[React]. The idea of this application is to be able to display the backend microservice characteristics based on an HTTP request performed by the frontend.
 
