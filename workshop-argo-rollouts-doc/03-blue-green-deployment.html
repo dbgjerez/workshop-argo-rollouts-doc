@@ -469,7 +469,7 @@ git push</code></pre>
 <h2 id="03-argo"><a class="anchor" href="#03-argo"></a>Argo CD Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We are going to create the application <strong>DStrategies</strong> to apply the files modified previously to test Blue/Green deployment. Please edit the following yaml and set your own GitHub repository in the <strong>reportURL</strong>. Create a file called <strong>application-dstrategies-blue-green.yaml</strong></p>
+<p>We are going to create the ArgoCD application <strong>film-storage-blue-green</strong>, to apply the files modified previously to test Blue/Green deployment. Please, edit the .yaml file named <strong>./argocd/film-storage-blue-green.yaml</strong>, and set your own GitHub repository in the <strong>repoURL</strong>.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -485,7 +485,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: blue-green
-    repoURL: <a href="https://github.com/change_me/dstrategies-app-deployment" class="bare">https://github.com/change_me/dstrategies-app-deployment</a>
+    repoURL: <a href="https://github.com/change_me/workshop-argo-rollouts-resources" class="bare">https://github.com/change_me/workshop-argo-rollouts-resources</a>
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -496,15 +496,16 @@ spec:
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc apply -f application-dstrategies-blue-green.yaml</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc apply -f argocd/film-storage-blue-green.yaml
+application.argoproj.io/film-storage-blue-green created</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Looking at the Argo CD dashboard, you would notice that we have a new <strong>DStrategies</strong> application.</p>
+<p>Looking at the Argo CD dashboard, you would notice that we have a new <strong>film-storage-blue-green</strong> application.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/argocd_dstrategies-blue-green.png" alt="ArgoCD DStrategies">
+<img src="_images/argocd_dstrategies-blue-green.png" alt="film-storage-blue-green">
 </div>
 </div>
 <div class="admonitionblock note">
@@ -522,47 +523,52 @@ It is important to wait for <strong>Healthy</strong> and <strong>Synced</strong>
 </div>
 </div>
 <div class="sect1">
-<h2 id="03-test"><a class="anchor" href="#03-test"></a>Test Dstrategies application</h2>
+<h2 id="03-test"><a class="anchor" href="#03-test"></a>Test film-storage application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We have deployed the <strong>DStrategies</strong> with ArgoCD. We can test the online and offline services to ensure that they are up and running.</p>
+<p>We have deployed the <strong>film-storage</strong> with ArgoCD. We can test the online and offline services to ensure that they are up and running.</p>
 </div>
 <div class="paragraph">
-<p>To test the online service, it is required to extract the frontend URL:</p>
+<p>To test the online service, it is required to extract the URL:</p>
 </div>
 <div class="listingblock lines_space console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get route dstrategies-frontend -n %USER%-blue-green -o jsonpath='{.spec.host}'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get route film-storage-online -n %USER%-blue-green -o jsonpath='{.spec.host}'</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Or you can use this <a href="http://dstrategies-frontend-%USER%-blue-green.apps.%CLUSTER%/">URL</a></p>
+<p>In addition, regarding testing the offline service, it is required to get the offline route:</p>
 </div>
-<div class="paragraph">
-<p>Visit the frontend via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
+<div class="listingblock lines_space console-input">
 <div class="content">
-<img src="_images/frontend-blue-green.png" alt="Frontend Interface">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc get route film-storage-offline -n %USER%-blue-green -o jsonpath='{.spec.host}'</code></pre>
 </div>
-<div class="title">Figure 1. Frontend Interface</div>
 </div>
 <div class="paragraph">
-<p>In addition, regarding testing the offline service, it is required to get the Offline route:</p>
+<p>We can test the endpoint with the following request:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl "$(oc get routes dstrategies-back-offline -n %USER%-blue-green --template='http://{{.spec.host}}')/dstrategies-back"</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">curl -s $(oc get route film-storage-offline -n %USER%-blue-green -o jsonpath='{.spec.host}')/api/v1/info | json_pp</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The result:</p>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">{"metadata":{"version":"V1.0.0","colour":"Green"}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">{
+   "app" : {
+      "buildTime" : "2023/01/10 15:17:57",
+      "name" : "film-storage",
+      "version" : "0.2"
+   }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Notice that in each microservice response we have added metadata information to see better the <strong>version</strong> of each application. This will help us to see the changes while we do the Blue/Green deployment.
-Because right now we have both routers against the same rollout revision we will have the same response with version <strong>V1.0.0</strong>:</p>
+Because right now we have both routers against the same rollout revision we will have the same response with version <strong>0.2</strong>:</p>
 </div>
 <div class="paragraph">
 <p>We can also see the rollout&#8217;s status.</p>
@@ -581,22 +587,22 @@ Argo Rollouts offers a Kubectl plugin to enrich the experience with Rollouts <a 
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-blue-green</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage-blue-green --watch -n %USER%-blue-green</code></pre>
 </div>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE INFO
-⟳ dstrategies-back                            Rollout     ✔ Healthy  12m
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                                 KIND        STATUS     AGE  INFO
+⟳ film-storage-blue-green                            Rollout     ✔ Healthy  60s
 └──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  12m  stable,active
-      └──□ dstrategies-back-67fc9fb79b-49k25  Pod         ✔ Running  12m  ready:1/1</code></pre>
+   └──⧉ film-storage-blue-green-644f5f6df7           ReplicaSet  ✔ Healthy  47s  stable,active
+      └──□ film-storage-blue-green-644f5f6df7-bhq6z  Pod         ✔ Running  46s  ready:1/1</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="03-deploy"><a class="anchor" href="#03-deploy"></a>DStrategies-back Blue/Green deployment</h2>
+<h2 id="03-deploy"><a class="anchor" href="#03-deploy"></a>film-storage Blue/Green deployment</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We have split a <strong>Cloud Native</strong> Blue/Green deployment into two steps:</p>
@@ -612,26 +618,20 @@ Argo Rollouts offers a Kubectl plugin to enrich the experience with Rollouts <a 
 </ol>
 </div>
 <div class="paragraph">
-<p>To test Blue/Green deployment we are going to do changes in the backend application <strong>dstrategies-back</strong>.</p>
+<p>To test Blue/Green deployment we are going to do changes in the backend application <strong>film-storage</strong>.</p>
 </div>
 <div class="paragraph">
-<p>We already deployed the <strong>dstrategies-back</strong> version V1.0.0, and we have a new dstrategies-back version V2.0.0 ready to be deployed.</p>
+<p>We already deployed the <strong>film-storage</strong> version 0.2, and we have a new film-storage version 0.3 ready to be deployed.</p>
 </div>
 <div class="sect2">
 <h3 id="03-step1"><a class="anchor" href="#03-step1"></a>Step 1 - Deploy a new version</h3>
 <div class="paragraph">
-<p>We will deploy a new version <strong>V2.0.0</strong>. To do so, we have to edit the files <strong>./blue-green/dstrategies-back-rollout.yaml</strong> and <strong>./blue-green/dstrategies-back-configmap.yaml</strong> to modify the value <strong>V1.0.0</strong> to <strong>V2.0.0</strong>:</p>
+<p>We will deploy a new version <strong>0.3</strong>. To do so, we have to edit the files <strong>./blue-green/film-storage-back-rollout.yaml</strong> to modify the value <strong>0.2</strong> to <strong>0.3</strong>:</p>
 </div>
 <div class="listingblock console-input">
-<div class="title">./blue-green/dstrategies-back-rollout.yaml</div>
+<div class="title">./blue-green/film-storage-back-rollout.yaml</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">          image: 'quay.io/dseveria/dstrategies-back:V2.0.0' &lt;---</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="title">./blue-green/dstrategies-back-configmap.yaml</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">  application.version: V2.0.0 &lt;---</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">          image: quay.io/dborrego/film-storage:0.2 &lt;---</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -640,7 +640,7 @@ Argo Rollouts offers a Kubectl plugin to enrich the experience with Rollouts <a 
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "Change dstrategies-back version to V2.0.0"
+git commit -m "Change film-storage version to 0.3"
 git push</code></pre>
 </div>
 </div>
@@ -649,28 +649,28 @@ git push</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/argocd-Dstrategies-blue-green-Refresh.png" alt="Refresh DStrategies">
+<img src="_images/argocd-Dstrategies-blue-green-Refresh.png" alt="Refresh film-storage blue/green">
 </div>
 </div>
 <div class="paragraph">
-<p><strong>Argo Rollouts</strong> will automatically deploy the new dstrategies-back version and execute the <strong>prePromotionAnalysis</strong>.</p>
+<p><strong>Argo Rollouts</strong> will automatically deploy the new film-storage version and execute the <strong>prePromotionAnalysis</strong>.</p>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-blue-green
-NAME                                  KIND         STATUS        AGE  INFO
-⟳ dstrategies-back                            Rollout      ॥ Paused      27m
-├──# revision:2
-│  ├──⧉ dstrategies-back-9dc6f576f            ReplicaSet   ✔ Healthy     36s  preview
-│  │  └──□ dstrategies-back-9dc6f576f-6vqp5   Pod          ✔ Running     36s  ready:1/1
-│  └──α dstrategies-back-9dc6f576f-2-pre      AnalysisRun  ✔ Successful  31s  ✔ 1
-└──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet   ✔ Healthy     27m  stable,active
-      └──□ dstrategies-back-67fc9fb79b-49k25  Pod          ✔ Running     27m  ready:1/1</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage-blue-green --watch -n %USER%-blue-green
+NAME                                                 KIND         STATUS        AGE    INFO
+⟳ film-storage-blue-green                            Rollout      ॥ Paused      19m
+├──# revision:6
+│  ├──⧉ film-storage-blue-green-7c455c98c8           ReplicaSet   ✔ Healthy     4m36s  preview
+│  │  └──□ film-storage-blue-green-7c455c98c8-m7bwh  Pod          ✔ Running     36s    ready:1/1
+│  └──α film-storage-blue-green-7c455c98c8-6-pre     AnalysisRun  ✔ Successful  27s    ✔ 1
+└──# revision:5
+   └──⧉ film-storage-blue-green-644f5f6df7           ReplicaSet   ✔ Healthy     19m    stable,active
+      └──□ film-storage-blue-green-644f5f6df7-bhq6z  Pod          ✔ Running     19m    ready:1/1</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If the <strong>prePromotionAnalysis</strong> goes well, we can see that offline applications have version V2.0.0 and the new attribute description, but the online version has not changed.</p>
+<p>If the <strong>prePromotionAnalysis</strong> goes well, we can see that offline applications have version 0.3 and the new attribute description, but the online version has not changed.</p>
 </div>
 <div class="paragraph">
 <p>This is our current status:</p>
@@ -690,7 +690,7 @@ NAME                                  KIND         STATUS        AGE  INFO
 <div class="content">
 <img src="_images/frontend-blue-green.png" alt="Frontend Interface">
 </div>
-<div class="title">Figure 2. Frontend Interface</div>
+<div class="title">Figure 1. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p>We can see that nothing has changed for the users.</p>
@@ -788,7 +788,7 @@ NAME                                  KIND         STATUS        AGE  INFO
 <div class="content">
 <img src="_images/frontend-blue-green-v2.png" alt="Frontend Interface V2.0.0">
 </div>
-<div class="title">Figure 3. Frontend Interface</div>
+<div class="title">Figure 2. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p><strong>We have in the online environment the new version V2.0.0!!!</strong></p>
@@ -858,7 +858,7 @@ NAME                                          KIND         STATUS        AGE   I
 <div class="content">
 <img src="_images/frontend-blue-green-v1.png" alt="Frontend Interface V1.0.0">
 </div>
-<div class="title">Figure 4. Frontend Interface</div>
+<div class="title">Figure 3. Frontend Interface</div>
 </div>
 <div class="paragraph">
 <p>The rollback is done!</p>
