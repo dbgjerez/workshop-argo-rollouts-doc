@@ -297,4 +297,4 @@ NAME                                      KIND         STATUS        AGE    INFO
 │  └──α film-storage-644f5f6df7-3         AnalysisRun  ✔ Successful  6m35s  ✔ 1
 ----
 
-
+If we review the terminal with the watch command, we'll look at all the responses with the new version.
