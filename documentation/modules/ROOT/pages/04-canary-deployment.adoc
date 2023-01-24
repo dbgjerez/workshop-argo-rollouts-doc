@@ -47,7 +47,7 @@ Please edit the file named *./canary/film-storage-analysis-template.yaml* to add
         web:
           jsonPath: '{$.status}'
           url: >-
-            http://dstrategies-back-online.<USERNAME>-canary.svc.cluster.local:8080/q/health/ready
+            http://film-storage.{user}-canary.svc.cluster.local/api/v1/health
       successCondition: result == 'UP'
 ----
 
