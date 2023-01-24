@@ -5,27 +5,8 @@ In the previous section, we executed a canary deployment using *Argo Rollouts* w
 
 To achieve the right percentage in each version, we are going to use traffic management with **Openshift Service Mesh** 
 
-Moreover, we have another huge improvement. The back application is sending metrics to Prometheus. We will configure *Argo Rollouts* to use those metrics to decide if keep increasing the amount of traffic to the new version or cancel the rollout.
-
-To get progressive delivery based on the Prometheus metrics. We have an AnalysisTemplate that fetches the metrics and decide if go on or cancel the rollout.
-
-[source,yaml,subs="+macros,+attributes"]
-----
-spec:
-  metrics:
-  - name: {{ include "service.name" . }}-prometheus-metric
-    interval: 10s
-    successCondition: len(result) == 0 || result[0] >= 0.95
-    failureLimit: 2
-    provider:
-      prometheus:
-        address: https://internal:<PROMETHEUS-PASSWORD>@prometheus.istio-system.svc.cluster.local:9090
-        query: |
-                    sum(irate( istio_requests_total{reporter="source",destination_service_name=~"dstrategies-back",response_code!~"5.*"}[30s] )) / sum(irate( istio_requests_total{reporter="source",destination_service_name=~"dstrategies-back"}[30s] ))
-----
-
 [#05-arch]
-== Generate DStrategies APP GitOps Deployment Model
+== Generate film-storage service mesh GitOps Application
 
 First of all, it is required to review a set of objects in our forked git repository to configure the deployment correctly for deploying our application following a GitOps model.
 
@@ -36,7 +17,7 @@ For this exercise, we are going to use Helm to render the different Kubernetes o
 
 We want you to define the steps to perform the canary deployment. You can choose the number of steps and the percentage of traffic. To learn more about **Argo Rollouts**, please read https://argoproj.github.io/argo-rollouts/features/canary/[this].
 
-Please edit the file named *./rhsm-canary/templates/dstrategies-back-rollout.yaml* to define **<SET-STEPS>** as you want and understand the canary deployment strategy:
+Please edit the file named *./rhsm-canary/templates/film-storage-back-rollout.yaml* to define **<SET-STEPS>** as you want and understand the canary deployment strategy:
 
 [source,yaml,subs="+macros,+attributes"]
 ----
@@ -63,28 +44,14 @@ Please edit the file named *./rhsm-canary/templates/dstrategies-back-rollout.yam
 [#05-helm]
 === Modify Helm values
 
-It is required to create a **Deployment** object to deploy the frontend application. This application helps us to test the canary rollout strategy from a web interface and see backend information.
-
-To allow communication between the frontend and the backend, it is required to edit the file named *./rhsm-canary/edit.values.yaml* to add the required **<OCP_DOMAIN>**. You can check their values in the xref:01-setup.adoc#01-parameters[parameters chapter].
+It is required to edit the file named *./rhsm-canary/edit.values.yaml* to add the required **<OCP_DOMAIN>**. You can check their values in the xref:01-setup.adoc#01-parameters[parameters chapter].
 
 [source,yaml,subs="+macros,+attributes"]
 ----
 service:
   image:
-    version: V1.0.0
+    version: 0.2
 domain: <OCP_DOMAIN>
-----
-
-[#05-prometheus]
-=== Obtain Red Hat Service Mesh Prometheus Password
-
-Finally, we need the Service Mesh Prometheus password. To get it, review the parameters table provided by the instructor. Then it is required to edit the file named *./rhsm-canary/templates/dstrategies-back-analysis-template.yaml* to add the required *<PROMETHEUS-PASSWORD>*.
-
-[source,yaml,subs="+macros,+attributes"]
-----
-    provider:
-      prometheus:
-        address: https://internal:<PROMETHEUS-PASSWORD>@prometheus.istio-system.svc.cluster.local:9090
 ----
 
 [#05-git]
@@ -96,14 +63,14 @@ Once all the files are configured correctly, it is time to commit and push all c
 [source,input,subs="+macros,+attributes"]
 ----
 git add .
-git commit -m "Configured DStrategies App deployment files for canary with Service Mesh strategy"
+git commit -m "Configured film-storage App deployment files for canary with Service Mesh strategy"
 git push
 ----
 
 [#05-deploy]
 == Deploy Dstrategies Application
 
-We are going to create the application *dstrategies*, which we will use to test canary deployment with Service Mesh. Because we will make changes in the application's GitHub repository, we have to use the repository that you have just forked. Please edit the following YAML and set your own GitHub repository in the *reportURL*. Create a file called *application-dstrategies-canary-rhsm.yaml*
+We are going to create the application *film-storage-service-mesh-canary*, which we will use to test canary deployment with Service Mesh. Because we will make changes in the application's GitHub repository, we have to use the repository that you have just forked. Please edit the following YAML and set your own GitHub repository in the *repoURL*. 
 
 [.console-input]
 [source,input,yaml,subs="+macros,+attributes"]
@@ -120,7 +87,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: rhsm-canary
-    repoURL: https://github.com/change_me/dstrategies-app-deployment
+    repoURL: https://github.com/change_me/workshop-argo-rollouts-resources
     targetRevision: HEAD    
     helm:
       valueFiles:
@@ -135,12 +102,12 @@ spec:
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc apply -f application-dstrategies-canary-rhsm.yaml
+oc apply -f argocd/film-storage-service-mesh-canary.yaml
 ----
 
-Looking at the Argo CD dashboard, you would notice that we have a new *dstrategies* application.
+Looking at the Argo CD dashboard, you would notice that we have a new *film-storage-service-mesh-canary* application.
  
-image::argocd_dstrategies-canary-service-mesh.png["ArgoCD Dstrategies"]
+image::argocd_dstrategies-canary-service-mesh.png["ArgoCD film-storage-service-mesh-canary"]
 
 [#05-app]
 == Application architecture
