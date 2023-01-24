@@ -378,7 +378,7 @@
         web:
           jsonPath: '{$.status}'
           url: &gt;-
-            <a href="http://dstrategies-back-online.&lt;USERNAME&gt;-canary.svc.cluster.local:8080/q/health/ready" class="bare">http://dstrategies-back-online.&lt;USERNAME&gt;-canary.svc.cluster.local:8080/q/health/ready</a>
+            <a href="http://film-storage.%USER%-canary.svc.cluster.local/api/v1/health" class="bare">http://film-storage.%USER%-canary.svc.cluster.local/api/v1/health</a>
       successCondition: result == 'UP'</code></pre>
 </div>
 </div>
@@ -462,7 +462,7 @@ spec:
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/canary-rollout-step-0.png" alt="Dstrategies initial status">
+<img src="_images/canary-rollout-step-0.png" alt="film-storage initial status">
 </div>
 </div>
 <div class="paragraph">
@@ -595,7 +595,7 @@ git push</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/argocd-Dstrategies-canary-Refresh.png" alt="Refresh Dstrategies">
+<img src="_images/argocd-Dstrategies-canary-Refresh.png" alt="film-storage canary refresh">
 </div>
 </div>
 <div class="paragraph">
@@ -603,7 +603,7 @@ git push</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/canary-rollout-step-1.png" alt="&quot;Dstrategies Step 1">
+<img src="_images/canary-rollout-step-1.png" alt="&quot;film-storage canary step 1">
 </div>
 </div>
 <div class="listingblock console-input">
@@ -642,7 +642,7 @@ git push</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/canary-rollout-step-2.png" alt="Dstrategies Step 2">
+<img src="_images/canary-rollout-step-2.png" alt="film-storage canary step 2">
 </div>
 </div>
 <div class="listingblock console-input">
@@ -677,7 +677,7 @@ git push</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/canary-rollout-step-3.png" alt="Dstrategies Step 3">
+<img src="_images/canary-rollout-step-3.png" alt="film-storage canary step 3">
 </div>
 </div>
 <div class="listingblock console-input">
