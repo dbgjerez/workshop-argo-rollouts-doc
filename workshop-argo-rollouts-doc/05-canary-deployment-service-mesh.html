@@ -609,39 +609,46 @@ git push</code></pre>
       └──□ film-storage-7587cfcc54-lkrgt  Pod          ✔ Running     67m  ready:2/2</code></pre>
 </div>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre>In Kiali, you can also see how the traffic going to each version changes.
-
-.Kiali graph V2
-image::kiali-graph-v2.png["Kiali graph V2"]
-
-Another important point is how ArgoCD change the percentage of traffic automatically in the virtual service instance:
-
-.ArgoCD
-image::kiali-graph-v3.png["ArgoCD Vritual Service"]
-
-### Deploy film-storage new version rollout finished
-
-When all the rollout steps have finished. **We have the new version 0.3 for all the users!!!**
-
-.Kiali graph V4
-image::kiali-graph-v4.png["Kiali graph V4"]
-
-In addition, Argo Rollouts will scale down the old version:
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]</pre>
+<div class="paragraph">
+<p>In Kiali, you can also see how the traffic going to each version changes.</p>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/kiali-graph-v2.png" alt="Kiali graph V2">
+</div>
+<div class="title">Figure 4. Kiali graph V2</div>
 </div>
 <div class="paragraph">
-<p>oc argo rollouts get rollout film-storage --watch -n %USER%-canary-service-mesh</p>
+<p>Another important point is how ArgoCD change the percentage of traffic automatically in the virtual service instance:</p>
 </div>
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>[.console-output]
-[source,input,subs="+macros,+attributes"]
-NAME                                      KIND         STATUS        AGE    INFO
+<img src="_images/kiali-graph-v3.png" alt="ArgoCD Vritual Service">
+</div>
+<div class="title">Figure 5. ArgoCD</div>
+</div>
+<div class="sect2">
+<h3 id="_deploy_film_storage_new_version_rollout_finished"><a class="anchor" href="#_deploy_film_storage_new_version_rollout_finished"></a>Deploy film-storage new version rollout finished</h3>
+<div class="paragraph">
+<p>When all the rollout steps have finished. <strong>We have the new version 0.3 for all the users!!!</strong></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/kiali-graph-v4.png" alt="Kiali graph V4">
+</div>
+<div class="title">Figure 6. Kiali graph V4</div>
+</div>
+<div class="paragraph">
+<p>In addition, Argo Rollouts will scale down the old version:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage --watch -n %USER%-canary-service-mesh</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                      KIND         STATUS        AGE    INFO
 ⟳ film-storage                            Rollout      ✔ Healthy     74m
 ├──# revision:2
 │  ├──⧉ film-storage-68c88f96cd           ReplicaSet   ✔ Healthy     7m35s  stable
@@ -653,7 +660,8 @@ NAME                                      KIND         STATUS        AGE    INFO
 │  ├──α film-storage-68c88f96cd-2.1       AnalysisRun  ✔ Successful  7m34s  ✔ 1
 │  └──α film-storage-68c88f96cd-2         AnalysisRun  ✔ Successful  7m34s  ✔ 1
 └──# revision:1
-   └──⧉ film-storage-7587cfcc54           ReplicaSet   • ScaledDown  74m</pre>
+   └──⧉ film-storage-7587cfcc54           ReplicaSet   • ScaledDown  74m</code></pre>
+</div>
 </div>
 </div>
 </div>
