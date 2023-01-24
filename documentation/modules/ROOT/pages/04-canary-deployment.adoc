@@ -110,7 +110,7 @@ image::argocd_dstrategies-canary.png["ArgoCD film-storage-canary strategy"]
 
 To achieve canary deployment with *Cloud Native* applications using **Argo Rollouts**, we have designed this architecture.
 
-image::canary-rollout-step-0.png["Dstrategies initial status"]
+image::canary-rollout-step-0.png["film-storage initial status"]
 
 OpenShift Components - Online
 
@@ -203,11 +203,11 @@ git push
 
 ArgoCD will refresh the status after some minutes. If you don't want to wait you can refresh it manually from ArgoCD UI.
 
-image::argocd-Dstrategies-canary-Refresh.png["Refresh Dstrategies"]
+image::argocd-Dstrategies-canary-Refresh.png["film-storage canary refresh"]
 
 This is our current status:
 
-image::canary-rollout-step-1.png["Dstrategies Step 1]
+image::canary-rollout-step-1.png["film-storage canary step 1]
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
@@ -242,7 +242,7 @@ After 30 seconds **Argo Rollouts** automatically will increase the number of rep
 
 This is our current status:
 
-image::canary-rollout-step-2.png["Dstrategies Step 2"]
+image::canary-rollout-step-2.png["film-storage canary step 2"]
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
@@ -273,7 +273,7 @@ After another 30 seconds, **Argo Rollouts** will increase the number of replicas
 
 This is our current status:
 
-image::canary-rollout-step-3.png["Dstrategies Step 3"]
+image::canary-rollout-step-3.png["film-storage canary step 3"]
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
