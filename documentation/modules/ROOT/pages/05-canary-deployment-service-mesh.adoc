@@ -68,7 +68,7 @@ git push
 ----
 
 [#05-deploy]
-== Deploy Dstrategies Application
+== Deploy film-storage Application
 
 We are going to create the application *film-storage-service-mesh-canary*, which we will use to test canary deployment with Service Mesh. Because we will make changes in the application's GitHub repository, we have to use the repository that you have just forked. Please edit the following YAML and set your own GitHub repository in the *repoURL*. 
 
@@ -78,7 +78,7 @@ We are going to create the application *film-storage-service-mesh-canary*, which
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dstrategies-canary-service-mesh
+  name: film-storage-service-mesh-canary
   namespace: {user}-gitops-argocd
 spec:
   destination:
@@ -114,75 +114,62 @@ image::argocd_dstrategies-canary-service-mesh.png["ArgoCD film-storage-service-m
 
 To achieve canary deployment with *Cloud Native* applications using **Argo Rollouts** and *Openshift Service Mesh*, we have designed this architecture.
 
-image::canary-service-mesh-rollout-step-0.png["Dstrategies initial status"]
+image::canary-service-mesh-rollout-step-0.png["film-storage initial status"]
 
 OpenShift Components
 
 - Only one route and service that maps to the Service Mesh Destination Rule.
-- A Destination Rule exposing the pods of the active Replica Sets.
-- One Replica Set for each version of the application.
-
-In Blue/Green deployment we always have an offline service to test the version that is not in production. In the case of canary deployment, we do not need it because progressively we will have the new version in production. 
+- A Destination Rule exposing the pods.
 
 We can also see the rollout's status.
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-canary-service-mesh
+oc argo rollouts get rollout film-storage --watch -n {user}-canary-service-mesh
 ----
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
 ----
-NAME                                  KIND        STATUS     AGE  INFO
-⟳ dstrategies-back                            Rollout     ✔ Healthy  38s  
-└──# revision:1                                                   
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  38s  stable
-      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  38s  ready:2/2
-      ├──□ dstrategies-back-67fc9fb79b-7c4jw  Pod         ✔ Running  38s  ready:2/2
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  38s  ready:2/2
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  38s  ready:2/2
+NAME                                      KIND        STATUS     AGE  INFO
+⟳ film-storage                            Rollout     ✔ Healthy  21m  
+└──# revision:1                                                       
+   └──⧉ film-storage-7587cfcc54           ReplicaSet  ✔ Healthy  21m  stable
+      ├──□ film-storage-7587cfcc54-7xdgl  Pod         ✔ Running  21m  ready:2/2
+      ├──□ film-storage-7587cfcc54-9vczq  Pod         ✔ Running  21m  ready:2/2
+      ├──□ film-storage-7587cfcc54-c8fgb  Pod         ✔ Running  21m  ready:2/2
+      ├──□ film-storage-7587cfcc54-f6m27  Pod         ✔ Running  21m  ready:2/2
+      └──□ film-storage-7587cfcc54-lkrgt  Pod         ✔ Running  21m  ready:2/2
 ----
 
-We have defined an active service `dstrategies-back`. Final users will always use `dstrategies-back``. When a new version is deployed, **Argo Rollouts** creates a new revision (ReplicaSet). The number of replicas in the new release increases based on the information in the steps, and the number of replicas in the old release decreases by the same number. But in this case, the amount of traffic that is sent to each version will be managed by the VirtualService.
+We have defined an active service `film-storage`. When a new version is deployed, **Argo Rollouts** creates a new revision (ReplicaSet). The number of replicas in the new release increases based on the information in the steps, and the number of replicas in the old release decreases by the same number. But in this case, the amount of traffic that is sent to each version will be managed by the VirtualService and DestinationRule.
 
 [#05-test]
-== Test Dstrategies application
+== Test film-storage application
  
-We have deployed the *dstrategies* with ArgoCD. We can test that it is up and running.
+We have deployed the *film-storage* with ArgoCD. We can test that it is up and running.
 
-Visit the back route via your web browser https://dstrategies-back-{user}-canary-service-mesh-istio-system.apps.%CLUSTER%/dstrategies-back[URL]
+Visit the back route via your web browser https://film-storage-{user}-canary-service-mesh-istio-system.apps.%CLUSTER%/api/v1/info[URL]
 
-IMPORTANT: It is required to accept *self-signed certificates* provided by Openshift
+Another possibility is to set the terminal making requests to the service: 
 
-.Openshift Self-signed Certificates Warning
-image::certs_warning.png[width=50%]
- 
-Then you can use the frontend https://dstrategies-frontend-{user}-canary-service-mesh-istio-system.apps.%CLUSTER%/[URL]
+[.console-input]
+[source,input,subs="+macros,+attributes"]
+----
+watch curl -s https://film-storage-{user}-canary-service-mesh-istio-system.apps.%CLUSTER%/api/v1/info
+{"app":{"name":"film-storage","version":"0.2","buildTime":"2023/01/10 15:17:57"}}
+----
 
-Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:
-
-.Frontend Interface
-image::frontend-canary-service-mesh.png["Frontend Interface"]
-
-Notice that we have added metadata information in each microservice response to see better the *version* of each application. This will help us to see the changes while we do the canary deployment.  We can see that the current version is *V1.0.0*.
 
 [#05-canary]
-== Dstrategies-back canary deployment
+== film-storage canary deployment
 
-To test canary deployment we are going to do changes in the backend application `dstrategies-back`.
+To test canary deployment we are going to do changes in the application.
  
-We will deploy a new version *V2.0.0*. 
+We will deploy a new version *0.3*. 
 
-Before applying these changes, it is important to monitor the current version via the frontend. To track all canary processes, it is required to prepare the frontend to generate multiple requests. *If there aren't multiple requests the back application will not have traffic and the rollout will fail*. Remember that we are using the metrics to decide if we go on with the rollout or not. Without traffic, we don't have metrics.
-
-Visit the frontend route via your web browser, edit the number of *Calls Retries* to 10000 and push - JUMP - button and ensure the following message is displaying on your screen:
-
-.Frontend Interface
-image::frontend-canary-service-mesh-retries.png["Frontend Interface"]
-
-**Argo Rollouts** will automatically deploy a new `dstrategies-back` revision. Based on the steps that you have defined, we will see how the traffic will go to the different versions.
+**Argo Rollouts** will automatically deploy a new `film-storage` revision. Based on the steps that you have defined, we will see how the traffic will go to the different versions.
 
 We also encourage you to use https://kiali-istio-system.apps.%CLUSTER%/[Kiali] graph to see the percentages of the traffic that goes to each version. Log in with your Openshift lab-user and select your namespace.
 
@@ -194,17 +181,17 @@ Then go to _Display_, _Show Edge Labels_ and select _Requests Percentage_.
 .Kiali labels
 image::kiali-labels.png["Kiali labels]
 
-We will see the dstrategies graph with 100% of the traffic going to V1.0.0
+We will see the graph with 100% of the traffic going to 0.2 version.
 
 .Kiali graph V1
 image::kiali-graph-v1.png["Kiali graph V1]
 
-We have to edit the files *./rhsm-canary/edit.values.yaml* to modify the value *v1.0.0* to *V2.0.0*:
+We have to edit the files *./rhsm-canary/edit.values.yaml* to modify the value *0.2* to *0.3*:
 
 [.console-input]
 [source,input,yaml,subs="+macros,+attributes"]
 ----
-    version: V2.0.0' <---
+    version: 0.2 <---
 ----
 [.console-input]
 
@@ -213,7 +200,7 @@ When you are ready to see all the changes on the fly. Push the changes to start 
 [source,input,subs="+macros,+attributes"]
 ----
 git add .
-git commit -m "Change dstrategies-back version to V2.0.0"
+git commit -m "Change version to 0.3"
 git push
 ----
 
@@ -221,119 +208,43 @@ ArgoCD will refresh the status after some minutes. If you don't want to wait you
 
 This is our current status (It can be different depending on the steps you have defined):
 
-image::canary-service-mesh-rollout-step-1.png["Dstrategies Step 1]
+image::canary-service-mesh-rollout-step-1.png["film-storage Step 1]
 
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-oc argo rollouts get rollout dstrategies-back --watch -n {user}-canary-service-mesh
+oc argo rollouts get rollout film-storage --watch -n {user}-canary-service-mesh
 ----
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
+NAME                                      KIND         STATUS        AGE  INFO
+⟳ film-storage                            Rollout      ॥ Paused      67m  
+├──# revision:2                                                           
+│  ├──⧉ film-storage-68c88f96cd           ReplicaSet   ✔ Healthy     19s  canary
+│  │  └──□ film-storage-68c88f96cd-sxvxz  Pod          ✔ Running     18s  ready:2/2
+│  ├──α film-storage-68c88f96cd-2.1       AnalysisRun  ✔ Successful  18s  ✔ 1
+│  └──α film-storage-68c88f96cd-2         AnalysisRun  ✔ Successful  18s  ✔ 1
+└──# revision:1                                                           
+   └──⧉ film-storage-7587cfcc54           ReplicaSet   ✔ Healthy     67m  stable
+      ├──□ film-storage-7587cfcc54-7xdgl  Pod          ✔ Running     67m  ready:2/2
+      ├──□ film-storage-7587cfcc54-9vczq  Pod          ✔ Running     67m  ready:2/2
+      ├──□ film-storage-7587cfcc54-c8fgb  Pod          ✔ Running     67m  ready:2/2
+      ├──□ film-storage-7587cfcc54-f6m27  Pod          ✔ Running     67m  ready:2/2
+      └──□ film-storage-7587cfcc54-lkrgt  Pod          ✔ Running     67m  ready:2/2
+
 ----
-NAME                                  KIND        STATUS     AGE    INFO
-⟳ dstrategies-back                            Rollout     ॥ Paused   3m13s  
-├──# revision:2                                                     
-│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  8s     canary
-│     └──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  8s     ready:2/2
-└──# revision:1                                                     
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m13s  stable
-      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  3m13s  ready:2/2
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m13s  ready:2/2
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m13s  ready:2/2
-----
-
-On the front web page, you will see how the versions change.
-
-New revision:
-
-.Frontend Interface
-image::frontend-canary-service-mesh-v2.png["Frontend Interface"]
-
-Old revision:
-
-
-.Frontend Interface
-image::frontend-canary-service-mesh.png["Frontend Interface"]
 
 In Kiali, you can also see how the traffic going to each version changes.
 
 .Kiali graph V2
-image::kiali-graph-v2.png["Kiali graph V2]
+image::kiali-graph-v2.png["Kiali graph V2"]
 
-### Deploy dstrategies-back new version rollout finished
+Another important point is how ArgoCD change the percentage of traffic automatically in the virtual service instance:
 
-When all the rollout steps have finished. **We have the new version V2.0.0 for all the users!!!**
+.ArgoCD
+image::kiali-graph-v3.png["ArgoCD Vritual Service"]
 
-image::canary-service-mesh-rollout-step-2.png["Dstrategies Step Rollback"]
+### Deploy film-storage new version rollout finished
 
-New revision:
-
-.Frontend Interface
-image::frontend-canary-service-mesh-v2.png["Frontend Interface"]
-
-[#05-rollback]
-### Rollback
-
-Imagine that something goes wrong, we know that this never happens but just in case. We can do a very *quick rollback* just by undoing the change.
-
-**Argo Rollouts** has an https://argoproj.github.io/argo-rollouts/generated/kubectl-argo-rollouts/kubectl-argo-rollouts_undo/[undo] command to do the rollback. In our opinion, we don't like this procedure because it is not aligned with GitOps. The changes that **Argo Rollouts** does do not come from git, so git is `OutOfSync` with what we have in Openshift.
-In our case the commit that we have done not only changes the ReplicaSet but also the ConfigMap. The *undo* command only changes the ReplicaSet, so it does not work for us.
-
-We recommend making changes in git rather than in Argo Rollouts. Therefore, we will revert the last commit:
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-git revert HEAD --no-edit
-----
-
-If we just revert the changes in git we will go back to the previous version. But **Argo Rollouts** will take this revert as a new release so it will do it throw the steps that we have configured. We want a *quick rollback* we don't want a step-by-step revert. To achieve the *quick rollback* we will configure **Argo Rollouts** without steps for the rollback.
-
-In the file *./rhsm-canary/templates/dstrategies-back-rollout.yaml*  under the *steps*, delete all the steps and only set one step *- setWeight: 100*:
-
-[source,yaml,subs="+macros,+attributes"]
-----
-  strategy:
-    canary:
-      trafficRouting:
-        istio:
-          virtualService:
-            routes:
-            - primary
-            name: {{ include "service.name" . }}
-          destinationRule:
-            name: {{ include "service.name" . }}
-            canarySubsetName: canary
-            stableSubsetName: stable
-      steps:
-        - setWeight: 100
-----
-
-Execute those commands to push the changes:
-
-[.console-input]
-[source,input,subs="+macros,+attributes"]
-----
-git add .
-git commit -m "delete steps for rollback"
-git push
-----
-
-**ArgoCD** will get the changes and apply them. **Argo Rollouts** will create a new revision with the previous version.
-
-The rollback is done!
-
-image::canary-service-mesh-rollout-step-rollback.png["Dstrategies Step Rollback"]
-
-To test the  service, you can use the frontend https://dstrategies-frontend-{user}-canary-service-mesh-istio-system.apps.%CLUSTER%/[URL]
-
-Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:
-
-.Frontend Interface
-image::frontend-canary-service-mesh.png["Frontend Interface"]
-
-
-To get the application ready for a new release we should configure again the  **Argo Rollouts** with the steps.
-
+When all the rollout steps have finished. **We have the new version 0.3 for all the users!!!**
