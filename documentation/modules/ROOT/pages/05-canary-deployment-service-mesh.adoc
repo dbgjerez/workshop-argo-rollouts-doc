@@ -218,6 +218,7 @@ oc argo rollouts get rollout film-storage --watch -n {user}-canary-service-mesh
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
+----
 NAME                                      KIND         STATUS        AGE  INFO
 ⟳ film-storage                            Rollout      ॥ Paused      67m  
 ├──# revision:2                                                           
@@ -262,6 +263,7 @@ oc argo rollouts get rollout film-storage --watch -n {user}-canary-service-mesh
 
 [.console-output]
 [source,input,subs="+macros,+attributes"]
+----
 NAME                                      KIND         STATUS        AGE    INFO
 ⟳ film-storage                            Rollout      ✔ Healthy     74m    
 ├──# revision:2                                                             
