@@ -402,7 +402,7 @@ git push</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="05-deploy"><a class="anchor" href="#05-deploy"></a>Deploy Dstrategies Application</h2>
+<h2 id="05-deploy"><a class="anchor" href="#05-deploy"></a>Deploy film-storage Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We are going to create the application <strong>film-storage-service-mesh-canary</strong>, which we will use to test canary deployment with Service Mesh. Because we will make changes in the application&#8217;s GitHub repository, we have to use the repository that you have just forked. Please edit the following YAML and set your own GitHub repository in the <strong>repoURL</strong>.</p>
@@ -412,7 +412,7 @@ git push</code></pre>
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dstrategies-canary-service-mesh
+  name: film-storage-service-mesh-canary
   namespace: %USER%-gitops-argocd
 spec:
   destination:
@@ -456,7 +456,7 @@ spec:
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/canary-service-mesh-rollout-step-0.png" alt="Dstrategies initial status">
+<img src="_images/canary-service-mesh-rollout-step-0.png" alt="film-storage initial status">
 </div>
 </div>
 <div class="paragraph">
@@ -468,108 +468,67 @@ spec:
 <p>Only one route and service that maps to the Service Mesh Destination Rule.</p>
 </li>
 <li>
-<p>A Destination Rule exposing the pods of the active Replica Sets.</p>
-</li>
-<li>
-<p>One Replica Set for each version of the application.</p>
+<p>A Destination Rule exposing the pods.</p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p>In Blue/Green deployment we always have an offline service to test the version that is not in production. In the case of canary deployment, we do not need it because progressively we will have the new version in production.</p>
 </div>
 <div class="paragraph">
 <p>We can also see the rollout&#8217;s status.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary-service-mesh</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage --watch -n %USER%-canary-service-mesh</code></pre>
 </div>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE  INFO
-⟳ dstrategies-back                            Rollout     ✔ Healthy  38s
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                      KIND        STATUS     AGE  INFO
+⟳ film-storage                            Rollout     ✔ Healthy  21m
 └──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  38s  stable
-      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  38s  ready:2/2
-      ├──□ dstrategies-back-67fc9fb79b-7c4jw  Pod         ✔ Running  38s  ready:2/2
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  38s  ready:2/2
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  38s  ready:2/2</code></pre>
+   └──⧉ film-storage-7587cfcc54           ReplicaSet  ✔ Healthy  21m  stable
+      ├──□ film-storage-7587cfcc54-7xdgl  Pod         ✔ Running  21m  ready:2/2
+      ├──□ film-storage-7587cfcc54-9vczq  Pod         ✔ Running  21m  ready:2/2
+      ├──□ film-storage-7587cfcc54-c8fgb  Pod         ✔ Running  21m  ready:2/2
+      ├──□ film-storage-7587cfcc54-f6m27  Pod         ✔ Running  21m  ready:2/2
+      └──□ film-storage-7587cfcc54-lkrgt  Pod         ✔ Running  21m  ready:2/2</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>We have defined an active service <code>dstrategies-back</code>. Final users will always use <code>dstrategies-back`</code>. When a new version is deployed, <strong>Argo Rollouts</strong> creates a new revision (ReplicaSet). The number of replicas in the new release increases based on the information in the steps, and the number of replicas in the old release decreases by the same number. But in this case, the amount of traffic that is sent to each version will be managed by the VirtualService.</p>
+<p>We have defined an active service <code>film-storage</code>. When a new version is deployed, <strong>Argo Rollouts</strong> creates a new revision (ReplicaSet). The number of replicas in the new release increases based on the information in the steps, and the number of replicas in the old release decreases by the same number. But in this case, the amount of traffic that is sent to each version will be managed by the VirtualService and DestinationRule.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="05-test"><a class="anchor" href="#05-test"></a>Test Dstrategies application</h2>
+<h2 id="05-test"><a class="anchor" href="#05-test"></a>Test film-storage application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We have deployed the <strong>dstrategies</strong> with ArgoCD. We can test that it is up and running.</p>
+<p>We have deployed the <strong>film-storage</strong> with ArgoCD. We can test that it is up and running.</p>
 </div>
 <div class="paragraph">
-<p>Visit the back route via your web browser <a href="https://dstrategies-back-%USER%-canary-service-mesh-istio-system.apps.%CLUSTER%/dstrategies-back">URL</a></p>
+<p>Visit the back route via your web browser <a href="https://film-storage-%USER%-canary-service-mesh-istio-system.apps.%CLUSTER%/api/v1/info">URL</a></p>
 </div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-It is required to accept <strong>self-signed certificates</strong> provided by Openshift
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>Another possibility is to set the terminal making requests to the service:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock console-input">
 <div class="content">
-<img src="_images/certs_warning.png" alt="certs warning" width="50%">
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">watch curl -s <a href="https://film-storage-%USER%-canary-service-mesh-istio-system.apps.%CLUSTER%/api/v1/info" class="bare">https://film-storage-%USER%-canary-service-mesh-istio-system.apps.%CLUSTER%/api/v1/info</a>
+{"app":{"name":"film-storage","version":"0.2","buildTime":"2023/01/10 15:17:57"}}</code></pre>
 </div>
-<div class="title">Figure 1. Openshift Self-signed Certificates Warning</div>
-</div>
-<div class="paragraph">
-<p>Then you can use the frontend <a href="https://dstrategies-frontend-%USER%-canary-service-mesh-istio-system.apps.%CLUSTER%/">URL</a></p>
-</div>
-<div class="paragraph">
-<p>Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-service-mesh.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 2. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>Notice that we have added metadata information in each microservice response to see better the <strong>version</strong> of each application. This will help us to see the changes while we do the canary deployment.  We can see that the current version is <strong>V1.0.0</strong>.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="05-canary"><a class="anchor" href="#05-canary"></a>Dstrategies-back canary deployment</h2>
+<h2 id="05-canary"><a class="anchor" href="#05-canary"></a>film-storage canary deployment</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To test canary deployment we are going to do changes in the backend application <code>dstrategies-back</code>.</p>
+<p>To test canary deployment we are going to do changes in the application.</p>
 </div>
 <div class="paragraph">
-<p>We will deploy a new version <strong>V2.0.0</strong>.</p>
+<p>We will deploy a new version <strong>0.3</strong>.</p>
 </div>
 <div class="paragraph">
-<p>Before applying these changes, it is important to monitor the current version via the frontend. To track all canary processes, it is required to prepare the frontend to generate multiple requests. <strong>If there aren&#8217;t multiple requests the back application will not have traffic and the rollout will fail</strong>. Remember that we are using the metrics to decide if we go on with the rollout or not. Without traffic, we don&#8217;t have metrics.</p>
-</div>
-<div class="paragraph">
-<p>Visit the frontend route via your web browser, edit the number of <strong>Calls Retries</strong> to 10000 and push - JUMP - button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-service-mesh-retries.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 3. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p><strong>Argo Rollouts</strong> will automatically deploy a new <code>dstrategies-back</code> revision. Based on the steps that you have defined, we will see how the traffic will go to the different versions.</p>
+<p><strong>Argo Rollouts</strong> will automatically deploy a new <code>film-storage</code> revision. Based on the steps that you have defined, we will see how the traffic will go to the different versions.</p>
 </div>
 <div class="paragraph">
 <p>We also encourage you to use <a href="https://kiali-istio-system.apps.%CLUSTER%/">Kiali</a> graph to see the percentages of the traffic that goes to each version. Log in with your Openshift lab-user and select your namespace.</p>
@@ -578,7 +537,7 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/kiali-namespace.png" alt="&quot;Kiali namespace">
 </div>
-<div class="title">Figure 4. Kiali namespace</div>
+<div class="title">Figure 1. Kiali namespace</div>
 </div>
 <div class="paragraph">
 <p>Then go to <em>Display</em>, <em>Show Edge Labels</em> and select <em>Requests Percentage</em>.</p>
@@ -587,23 +546,23 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="content">
 <img src="_images/kiali-labels.png" alt="&quot;Kiali labels">
 </div>
-<div class="title">Figure 5. Kiali labels</div>
+<div class="title">Figure 2. Kiali labels</div>
 </div>
 <div class="paragraph">
-<p>We will see the dstrategies graph with 100% of the traffic going to V1.0.0</p>
+<p>We will see the graph with 100% of the traffic going to 0.2 version.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/kiali-graph-v1.png" alt="&quot;Kiali graph V1">
 </div>
-<div class="title">Figure 6. Kiali graph V1</div>
+<div class="title">Figure 3. Kiali graph V1</div>
 </div>
 <div class="paragraph">
-<p>We have to edit the files <strong>./rhsm-canary/edit.values.yaml</strong> to modify the value <strong>v1.0.0</strong> to <strong>V2.0.0</strong>:</p>
+<p>We have to edit the files <strong>./rhsm-canary/edit.values.yaml</strong> to modify the value <strong>0.2</strong> to <strong>0.3</strong>:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">    version: V2.0.0' &lt;---</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">    version: 0.2 &lt;---</code></pre>
 </div>
 </div>
 <div class="paragraph console-input">
@@ -612,7 +571,7 @@ It is required to accept <strong>self-signed certificates</strong> provided by O
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "Change dstrategies-back version to V2.0.0"
+git commit -m "Change version to 0.3"
 git push</code></pre>
 </div>
 </div>
@@ -624,154 +583,47 @@ git push</code></pre>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/canary-service-mesh-rollout-step-1.png" alt="&quot;Dstrategies Step 1">
+<img src="_images/canary-service-mesh-rollout-step-1.png" alt="&quot;film-storage Step 1">
 </div>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout dstrategies-back --watch -n %USER%-canary-service-mesh</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc argo rollouts get rollout film-storage --watch -n %USER%-canary-service-mesh</code></pre>
 </div>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                  KIND        STATUS     AGE    INFO
-⟳ dstrategies-back                            Rollout     ॥ Paused   3m13s
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">NAME                                      KIND         STATUS        AGE  INFO
+⟳ film-storage                            Rollout      ॥ Paused      67m
 ├──# revision:2
-│  └──⧉ dstrategies-back-9dc6f576f            ReplicaSet  ✔ Healthy  8s     canary
-│     └──□ dstrategies-back-9dc6f576f-fwq8m   Pod         ✔ Running  8s     ready:2/2
+│  ├──⧉ film-storage-68c88f96cd           ReplicaSet   ✔ Healthy     19s  canary
+│  │  └──□ film-storage-68c88f96cd-sxvxz  Pod          ✔ Running     18s  ready:2/2
+│  ├──α film-storage-68c88f96cd-2.1       AnalysisRun  ✔ Successful  18s  ✔ 1
+│  └──α film-storage-68c88f96cd-2         AnalysisRun  ✔ Successful  18s  ✔ 1
 └──# revision:1
-   └──⧉ dstrategies-back-67fc9fb79b           ReplicaSet  ✔ Healthy  3m13s  stable
-      ├──□ dstrategies-back-67fc9fb79b-4ql4z  Pod         ✔ Running  3m13s  ready:2/2
-      ├──□ dstrategies-back-67fc9fb79b-lz86j  Pod         ✔ Running  3m13s  ready:2/2
-      └──□ dstrategies-back-67fc9fb79b-xlkhp  Pod         ✔ Running  3m13s  ready:2/2</code></pre>
+   └──⧉ film-storage-7587cfcc54           ReplicaSet   ✔ Healthy     67m  stable
+      ├──□ film-storage-7587cfcc54-7xdgl  Pod          ✔ Running     67m  ready:2/2
+      ├──□ film-storage-7587cfcc54-9vczq  Pod          ✔ Running     67m  ready:2/2
+      ├──□ film-storage-7587cfcc54-c8fgb  Pod          ✔ Running     67m  ready:2/2
+      ├──□ film-storage-7587cfcc54-f6m27  Pod          ✔ Running     67m  ready:2/2
+      └──□ film-storage-7587cfcc54-lkrgt  Pod          ✔ Running     67m  ready:2/2</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>On the front web page, you will see how the versions change.</p>
-</div>
-<div class="paragraph">
-<p>New revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-service-mesh-v2.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 7. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>Old revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-service-mesh.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 8. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>In Kiali, you can also see how the traffic going to each version changes.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/kiali-graph-v2.png" alt="&quot;Kiali graph V2">
-</div>
-<div class="title">Figure 9. Kiali graph V2</div>
-</div>
-<div class="sect2">
-<h3 id="_deploy_dstrategies_back_new_version_rollout_finished"><a class="anchor" href="#_deploy_dstrategies_back_new_version_rollout_finished"></a>Deploy dstrategies-back new version rollout finished</h3>
-<div class="paragraph">
-<p>When all the rollout steps have finished. <strong>We have the new version V2.0.0 for all the users!!!</strong></p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/canary-service-mesh-rollout-step-2.png" alt="Dstrategies Step Rollback">
-</div>
-</div>
-<div class="paragraph">
-<p>New revision:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-service-mesh-v2.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 10. Frontend Interface</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="05-rollback"><a class="anchor" href="#05-rollback"></a>Rollback</h3>
-<div class="paragraph">
-<p>Imagine that something goes wrong, we know that this never happens but just in case. We can do a very <strong>quick rollback</strong> just by undoing the change.</p>
-</div>
-<div class="paragraph">
-<p><strong>Argo Rollouts</strong> has an <a href="https://argoproj.github.io/argo-rollouts/generated/kubectl-argo-rollouts/kubectl-argo-rollouts_undo/">undo</a> command to do the rollback. In our opinion, we don&#8217;t like this procedure because it is not aligned with GitOps. The changes that <strong>Argo Rollouts</strong> does do not come from git, so git is <code>OutOfSync</code> with what we have in Openshift.
-In our case the commit that we have done not only changes the ReplicaSet but also the ConfigMap. The <strong>undo</strong> command only changes the ReplicaSet, so it does not work for us.</p>
-</div>
-<div class="paragraph">
-<p>We recommend making changes in git rather than in Argo Rollouts. Therefore, we will revert the last commit:</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git revert HEAD --no-edit</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If we just revert the changes in git we will go back to the previous version. But <strong>Argo Rollouts</strong> will take this revert as a new release so it will do it throw the steps that we have configured. We want a <strong>quick rollback</strong> we don&#8217;t want a step-by-step revert. To achieve the <strong>quick rollback</strong> we will configure <strong>Argo Rollouts</strong> without steps for the rollback.</p>
-</div>
-<div class="paragraph">
-<p>In the file <strong>./rhsm-canary/templates/dstrategies-back-rollout.yaml</strong>  under the <strong>steps</strong>, delete all the steps and only set one step <strong>- setWeight: 100</strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  strategy:
-    canary:
-      trafficRouting:
-        istio:
-          virtualService:
-            routes:
-            - primary
-            name: {{ include "service.name" . }}
-          destinationRule:
-            name: {{ include "service.name" . }}
-            canarySubsetName: canary
-            stableSubsetName: stable
-      steps:
-        - setWeight: 100</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Execute those commands to push the changes:</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "delete steps for rollback"
-git push</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>ArgoCD</strong> will get the changes and apply them. <strong>Argo Rollouts</strong> will create a new revision with the previous version.</p>
-</div>
-<div class="paragraph">
-<p>The rollback is done!</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/canary-service-mesh-rollout-step-rollback.png" alt="Dstrategies Step Rollback">
-</div>
-</div>
-<div class="paragraph">
-<p>To test the  service, you can use the frontend <a href="https://dstrategies-frontend-%USER%-canary-service-mesh-istio-system.apps.%CLUSTER%/">URL</a></p>
-</div>
-<div class="paragraph">
-<p>Visit the frontend route via your web browser, push - JUMP - button and ensure the following message is displaying on your screen:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/frontend-canary-service-mesh.png" alt="Frontend Interface">
-</div>
-<div class="title">Figure 11. Frontend Interface</div>
-</div>
-<div class="paragraph">
-<p>To get the application ready for a new release we should configure again the  <strong>Argo Rollouts</strong> with the steps.</p>
+<pre>In Kiali, you can also see how the traffic going to each version changes.
+
+.Kiali graph V2
+image::kiali-graph-v2.png["Kiali graph V2"]
+
+Another important point is how ArgoCD change the percentage of traffic automatically in the virtual service instance:
+
+.ArgoCD
+image::kiali-graph-v3.png["ArgoCD Vritual Service"]
+
+### Deploy film-storage new version rollout finished
+
+When all the rollout steps have finished. **We have the new version 0.3 for all the users!!!**</pre>
 </div>
 </div>
 </div>
