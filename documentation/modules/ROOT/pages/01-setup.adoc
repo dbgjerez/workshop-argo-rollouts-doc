@@ -170,49 +170,9 @@ Please fork the repository and clone it in your local machine to have full auton
 [.console-input]
 [source,input,subs="+macros,+attributes"]
 ----
-git clone https://github.com/change_me/dstrategies-app-deployment
-cd dstrategies-app-deployment
+git clone https://github.com/change_me/workshop-argo-rollouts-resources
+cd workshop-argo-rollouts-resources
 ----
-
-
-
-==== Configure your GitHub token
-
-.Why do I need this?
-[TIP]
-====
-GitHub does not allow user-pass authentication anymore. Therefore, if you cloned the repo using the HTTPS link, you will need to generate a GH Token.
-====
-
-Currently, there are two types of GitHub Personal Access Tokens (PATs): Fine-grained tokens and Classic tokens. *Fine-grained personal access tokens* give developers granular control over the permissions and repository access they grant to a PAT and are the new alternative to the traditional Classic tokens. That is why we will use Fine-grained tokens.
-
-1. Access the https://github.com/settings/tokens?type=beta[`New fine-grained personal access token` page for your GitHub account].
-2. Click on `Generate new token`.
-+
-3. Enter the following values:
-* Token name: `dstrategies-app-deployment`.
-* Expiration: `7 days`.
-* Description: `Token to manage my dstrategies-app-deployment repository from automation pipelines`.
-* Resource owner: Yourself.
-* Repository access: Select `Only selected repositories` and choose the repository that you just cloned.
-+
-.Step 1 to create a GitHub token
-image::github-token-01.png["Step 1 to create a GitHub token"]
-+
-4. Now choose the following permissions for this token:
-* `Contents: Access: Read and Write`: To allow pushing commits to the repository.
-* `Pull requests: Access: Read and Write`: To allow automating pull-requests creation.
-+
-.Step 2 to create a GitHub token
-image::github-token-02.png["Step 2 to create a GitHub token"]
-+
-5. Click on `Generate Token`.
-6. Copy the token content, as you will not be able to see it again. You will need it later *on several occasions*.
-
-
-
-
-
 
 [#01-clusterSetup]
 == Cluster Setup
