@@ -623,7 +623,37 @@ image::kiali-graph-v3.png["ArgoCD Vritual Service"]
 
 ### Deploy film-storage new version rollout finished
 
-When all the rollout steps have finished. **We have the new version 0.3 for all the users!!!**</pre>
+When all the rollout steps have finished. **We have the new version 0.3 for all the users!!!**
+
+.Kiali graph V4
+image::kiali-graph-v4.png["Kiali graph V4"]
+
+In addition, Argo Rollouts will scale down the old version:
+
+[.console-input]
+[source,input,subs="+macros,+attributes"]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>oc argo rollouts get rollout film-storage --watch -n %USER%-canary-service-mesh</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[.console-output]
+[source,input,subs="+macros,+attributes"]
+NAME                                      KIND         STATUS        AGE    INFO
+⟳ film-storage                            Rollout      ✔ Healthy     74m
+├──# revision:2
+│  ├──⧉ film-storage-68c88f96cd           ReplicaSet   ✔ Healthy     7m35s  stable
+│  │  ├──□ film-storage-68c88f96cd-sxvxz  Pod          ✔ Running     7m34s  ready:2/2
+│  │  ├──□ film-storage-68c88f96cd-bnbfb  Pod          ✔ Running     2m27s  ready:2/2
+│  │  ├──□ film-storage-68c88f96cd-g49j2  Pod          ✔ Running     2m27s  ready:2/2
+│  │  ├──□ film-storage-68c88f96cd-llzx5  Pod          ✔ Running     2m27s  ready:2/2
+│  │  └──□ film-storage-68c88f96cd-m6wnv  Pod          ✔ Running     2m27s  ready:2/2
+│  ├──α film-storage-68c88f96cd-2.1       AnalysisRun  ✔ Successful  7m34s  ✔ 1
+│  └──α film-storage-68c88f96cd-2         AnalysisRun  ✔ Successful  7m34s  ✔ 1
+└──# revision:1
+   └──⧉ film-storage-7587cfcc54           ReplicaSet   • ScaledDown  74m</pre>
 </div>
 </div>
 </div>
