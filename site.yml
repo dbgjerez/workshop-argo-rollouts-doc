@@ -3,7 +3,7 @@ runtime:
 
 site:
   title: "RHTE Workshop - Deployment Strategies with Argo CD and Argo Rollouts"
-  url: https://github.com/dbgjerez/workshop-argo-rollouts-doc
+  url: https://github.com/dbgjerez/
   start_page: workshop-argo-rollouts-doc::index.adoc
 
 
