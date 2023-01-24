@@ -330,31 +330,10 @@
 <div class="paragraph">
 <p>To achieve the right percentage in each version, we are going to use traffic management with <strong>Openshift Service Mesh</strong></p>
 </div>
-<div class="paragraph">
-<p>Moreover, we have another huge improvement. The back application is sending metrics to Prometheus. We will configure <strong>Argo Rollouts</strong> to use those metrics to decide if keep increasing the amount of traffic to the new version or cancel the rollout.</p>
-</div>
-<div class="paragraph">
-<p>To get progressive delivery based on the Prometheus metrics. We have an AnalysisTemplate that fetches the metrics and decide if go on or cancel the rollout.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">spec:
-  metrics:
-  - name: {{ include "service.name" . }}-prometheus-metric
-    interval: 10s
-    successCondition: len(result) == 0 || result[0] &gt;= 0.95
-    failureLimit: 2
-    provider:
-      prometheus:
-        address: <a href="https://internal:&lt;PROMETHEUS-PASSWORD&gt;@prometheus.istio-system.svc.cluster.local:9090" class="bare">https://internal:&lt;PROMETHEUS-PASSWORD&gt;@prometheus.istio-system.svc.cluster.local:9090</a>
-        query: |
-                    sum(irate( istio_requests_total{reporter="source",destination_service_name=~"dstrategies-back",response_code!~"5.*"}[30s] )) / sum(irate( istio_requests_total{reporter="source",destination_service_name=~"dstrategies-back"}[30s] ))</code></pre>
-</div>
-</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="05-arch"><a class="anchor" href="#05-arch"></a>Generate DStrategies APP GitOps Deployment Model</h2>
+<h2 id="05-arch"><a class="anchor" href="#05-arch"></a>Generate film-storage service mesh GitOps Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>First of all, it is required to review a set of objects in our forked git repository to configure the deployment correctly for deploying our application following a GitOps model.</p>
@@ -368,7 +347,7 @@
 <p>We want you to define the steps to perform the canary deployment. You can choose the number of steps and the percentage of traffic. To learn more about <strong>Argo Rollouts</strong>, please read <a href="https://argoproj.github.io/argo-rollouts/features/canary/">this</a>.</p>
 </div>
 <div class="paragraph">
-<p>Please edit the file named <strong>./rhsm-canary/templates/dstrategies-back-rollout.yaml</strong> to define <strong>&lt;SET-STEPS&gt;</strong> as you want and understand the canary deployment strategy:</p>
+<p>Please edit the file named <strong>./rhsm-canary/templates/film-storage-back-rollout.yaml</strong> to define <strong>&lt;SET-STEPS&gt;</strong> as you want and understand the canary deployment strategy:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -396,30 +375,14 @@
 <div class="sect2">
 <h3 id="05-helm"><a class="anchor" href="#05-helm"></a>Modify Helm values</h3>
 <div class="paragraph">
-<p>It is required to create a <strong>Deployment</strong> object to deploy the frontend application. This application helps us to test the canary rollout strategy from a web interface and see backend information.</p>
-</div>
-<div class="paragraph">
-<p>To allow communication between the frontend and the backend, it is required to edit the file named <strong>./rhsm-canary/edit.values.yaml</strong> to add the required <strong>&lt;OCP_DOMAIN&gt;</strong>. You can check their values in the <a href="01-setup.html#01-parameters" class="xref page">parameters chapter</a>.</p>
+<p>It is required to edit the file named <strong>./rhsm-canary/edit.values.yaml</strong> to add the required <strong>&lt;OCP_DOMAIN&gt;</strong>. You can check their values in the <a href="01-setup.html#01-parameters" class="xref page">parameters chapter</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">service:
   image:
-    version: V1.0.0
+    version: 0.2
 domain: &lt;OCP_DOMAIN&gt;</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="05-prometheus"><a class="anchor" href="#05-prometheus"></a>Obtain Red Hat Service Mesh Prometheus Password</h3>
-<div class="paragraph">
-<p>Finally, we need the Service Mesh Prometheus password. To get it, review the parameters table provided by the instructor. Then it is required to edit the file named <strong>./rhsm-canary/templates/dstrategies-back-analysis-template.yaml</strong> to add the required <strong>&lt;PROMETHEUS-PASSWORD&gt;</strong>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">    provider:
-      prometheus:
-        address: <a href="https://internal:&lt;PROMETHEUS-PASSWORD&gt;@prometheus.istio-system.svc.cluster.local:9090" class="bare">https://internal:&lt;PROMETHEUS-PASSWORD&gt;@prometheus.istio-system.svc.cluster.local:9090</a></code></pre>
 </div>
 </div>
 </div>
@@ -431,7 +394,7 @@ domain: &lt;OCP_DOMAIN&gt;</code></pre>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">git add .
-git commit -m "Configured DStrategies App deployment files for canary with Service Mesh strategy"
+git commit -m "Configured film-storage App deployment files for canary with Service Mesh strategy"
 git push</code></pre>
 </div>
 </div>
@@ -442,7 +405,7 @@ git push</code></pre>
 <h2 id="05-deploy"><a class="anchor" href="#05-deploy"></a>Deploy Dstrategies Application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We are going to create the application <strong>dstrategies</strong>, which we will use to test canary deployment with Service Mesh. Because we will make changes in the application&#8217;s GitHub repository, we have to use the repository that you have just forked. Please edit the following YAML and set your own GitHub repository in the <strong>reportURL</strong>. Create a file called <strong>application-dstrategies-canary-rhsm.yaml</strong></p>
+<p>We are going to create the application <strong>film-storage-service-mesh-canary</strong>, which we will use to test canary deployment with Service Mesh. Because we will make changes in the application&#8217;s GitHub repository, we have to use the repository that you have just forked. Please edit the following YAML and set your own GitHub repository in the <strong>repoURL</strong>.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -458,7 +421,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: rhsm-canary
-    repoURL: <a href="https://github.com/change_me/dstrategies-app-deployment" class="bare">https://github.com/change_me/dstrategies-app-deployment</a>
+    repoURL: <a href="https://github.com/change_me/workshop-argo-rollouts-resources" class="bare">https://github.com/change_me/workshop-argo-rollouts-resources</a>
     targetRevision: HEAD
     helm:
       valueFiles:
@@ -472,15 +435,15 @@ spec:
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc apply -f application-dstrategies-canary-rhsm.yaml</code></pre>
+<pre class="highlightjs highlight"><code class="language-input hljs" data-lang="input">oc apply -f argocd/film-storage-service-mesh-canary.yaml</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Looking at the Argo CD dashboard, you would notice that we have a new <strong>dstrategies</strong> application.</p>
+<p>Looking at the Argo CD dashboard, you would notice that we have a new <strong>film-storage-service-mesh-canary</strong> application.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="_images/argocd_dstrategies-canary-service-mesh.png" alt="ArgoCD Dstrategies">
+<img src="_images/argocd_dstrategies-canary-service-mesh.png" alt="ArgoCD film-storage-service-mesh-canary">
 </div>
 </div>
 </div>
